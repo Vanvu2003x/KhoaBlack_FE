@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FaClock, FaDiscord, FaFacebook, FaGithub } from "react-icons/fa";
+import { FaClock, FaDiscord, FaFacebook, FaGithub, FaTelegram } from "react-icons/fa";
 import { FaMessage } from "react-icons/fa6";
 import { SiZalo } from "react-icons/si";
 
@@ -24,26 +24,23 @@ export default function Footer() {
                     <h3 className="text-white text-lg font-semibold mb-4 border-b border-gray-600 pb-2">LIÊN HỆ</h3>
                     <ul className="space-y-2">
                         <li>
-                            <Link href="#" className="flex items-center gap-2 hover:text-amber-500 transition-colors">
+                            <Link href="https://www.facebook.com/Napgameuytin2111/" className="flex items-center gap-2 hover:text-amber-500 transition-colors">
                                 <FaFacebook /> Facebook
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="#" className="flex items-center gap-2 hover:text-amber-500 transition-colors">
-                                <FaDiscord /> Discord
                             </Link>
                         </li>
                     </ul>
                 </div>
 
                 <div>
-                    <h3 className="text-white text-lg font-semibold mb-4 border-b border-gray-600 pb-2">HỖ TRỢ</h3>
+                    <h3 className="text-white text-lg font-semibold mb-4 border-b border-gray-600 pb-2">LIÊN HỆ ĐỐI TÁC</h3>
                     <ul className="space-y-2">
-                        <li className="flex items-center gap-2">
-                            <FaClock /> Hỗ trợ: 8h - 24h mỗi ngày
+                        <li>
+                            <Link href="https://t.me/YuuKayTopUp" className="flex items-center gap-2 hover:text-amber-500 transition-colors">
+                                <FaTelegram /> Telegram
+                            </Link>
                         </li>
-                        <li className="flex items-center gap-2">
-                            <FaMessage /> Zalo: 0963575203
+                        <li href="https://zalo.me/0866996056" className="flex items-center gap-2">
+                            <SiZalo /> Zalo: 0866996056
                         </li>
                     </ul>
                 </div>
@@ -54,9 +51,9 @@ export default function Footer() {
                     © 2025 - Phát triển bởi <span className="text-amber-500">Van Vu</span>
                 </div>
                 <div className="flex gap-4 text-lg">
-                    <Link href="#" className="hover:text-amber-500"><FaGithub /></Link>
-                    <Link href="#" className="hover:text-amber-500"><FaFacebook /></Link>
-                    <Link href="#" className="hover:text-amber-500"><SiZalo /></Link>
+                    <Link href="https://github.com/Vanvu2003x" className="hover:text-amber-500"><FaGithub /></Link>
+                    <Link href="https://www.facebook.com/van.vu.488317" className="hover:text-amber-500"><FaFacebook /></Link>
+                    <Link href="https://zalo.me/063575203" className="hover:text-amber-500"><SiZalo /></Link>
                 </div>
             </div>
         </footer>
