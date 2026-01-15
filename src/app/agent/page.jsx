@@ -9,7 +9,7 @@ import {
     getOrdersByUserNap,
     getOrderSummary,
 } from "@/services/order.service";
-import { toast } from "react-toastify";
+import { useToast } from "@/components/ui/Toast";
 import { getRole } from "@/services/auth.service";
 
 const urlBase = process.env.NEXT_PUBLIC_API_URL;
@@ -22,6 +22,7 @@ const statuses = [
 ];
 
 export default function AgentManager() {
+    const toast = useToast();
     const router = useRouter();
     const [orders, setOrders] = useState([]);
     const [status, setStatus] = useState("pending");

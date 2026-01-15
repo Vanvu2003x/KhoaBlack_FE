@@ -3,10 +3,8 @@ import { useEffect, useState } from "react";
 import Stat from "@/components/admin/stat";
 import LineChartComponent from "@/components/admin/revenueManager/chart";
 import { getTopupStats } from "@/services/toup-wallet-logs.service";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { getOrderStatistics } from "@/services/order.service";
+import { FiBarChart2, FiTrendingUp, FiTrendingDown, FiDollarSign, FiActivity } from "react-icons/fi";
 
 const formatCurrency = (value) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -18,9 +16,6 @@ const formatCurrency = (value) => {
 };
 
 export default function RevenueManagerPage() {
-    const [fromDate, setFromDate] = useState(new Date());
-    const [toDate, setToDate] = useState(new Date());
-
     const [TotalRevenue, setTotalRevenue] = useState(0);
     const [TotalRevenueThisMonth, setTotalRevenueThisMonth] = useState(0);
     const [TotalRevenueThisDay, setTotalRevenueThisDay] = useState(0);
@@ -94,51 +89,77 @@ export default function RevenueManagerPage() {
 
 
     return (
-        <div className="bg-[#F4F6FA] p-10">
-            <div className="flex gap-4 justify-between">
+        <div className="space-y-6 animate-[fadeIn_0.5s_ease-out]">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#1E293B]/50 backdrop-blur-xl p-6 rounded-2xl border border-white/5 shadow-xl">
+                <div>
+                    <h1 className="text-2xl font-bold bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent flex items-center gap-2">
+                        <FiBarChart2 className="text-teal-400" /> Báo cáo Doanh thu
+                    </h1>
+                    <p className="text-slate-400 text-sm mt-1">
+                        Thống kê chi tiết doanh thu và chi phí
+                    </p>
+                </div>
+            </div>
+
+            {/* Revenue Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Stat
-                    className={"border-blue-600 text-blue-600 bg-teal-300"}
+                    className={"!bg-[#1E293B]/50 border-blue-500/50 text-blue-400 hover:bg-blue-500/10"}
                     title="Tổng doanh thu"
                     info={formatCurrency(TotalRevenue)}
+                    icon={<FiDollarSign className="text-blue-500" size={24} />}
                 />
                 <Stat
-                    className={"border-pink-600 text-pink-600"}
-                    title="Tổng doanh thu tháng này"
+                    className={"!bg-[#1E293B]/50 border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"}
+                    title="Doanh thu tháng này"
                     info={formatCurrency(TotalRevenueThisMonth)}
+                    icon={<FiTrendingUp className="text-cyan-500" size={24} />}
                 />
                 <Stat
-                    className={"border-green-600 text-green-600"}
-                    title="Tổng doanh thu hôm nay"
+                    className={"!bg-[#1E293B]/50 border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10"}
+                    title="Doanh thu hôm nay"
                     info={formatCurrency(TotalRevenueThisDay)}
+                    icon={<FiActivity className="text-emerald-500" size={24} />}
                 />
             </div>
 
-            <div className="flex gap-4 justify-between mt-6">
+            {/* Cost Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Stat
-                    className={"border-red-600 text-red-600 bg-red-100"}
+                    className={"!bg-[#1E293B]/50 border-rose-500/50 text-rose-400 hover:bg-rose-500/10"}
                     title="Tổng chi phí"
                     info={formatCurrency(TotalCost)}
+                    icon={<FiTrendingDown className="text-rose-500" size={24} />}
                 />
                 <Stat
-                    className={"border-orange-600 text-orange-600 bg-orange-100"}
+                    className={"!bg-[#1E293B]/50 border-orange-500/50 text-orange-400 hover:bg-orange-500/10"}
                     title="Chi phí tháng này"
                     info={formatCurrency(TotalCostThisMonth)}
                 />
                 <Stat
-                    className={"border-yellow-600 text-yellow-600 bg-yellow-100"}
+                    className={"!bg-[#1E293B]/50 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10"}
                     title="Chi phí hôm nay"
                     info={formatCurrency(TotalCostThisDay)}
                 />
             </div>
 
-            <div className="w-full p-4 border-2 mt-4 bg-teal-100">
-                {mergedChartData.length > 0 ? (
-                    <LineChartComponent rawData={mergedChartData} />
-                ) : (
-                    <div className="text-center py-10 text-gray-500 italic">
-                        Không có dữ liệu biểu đồ
-                    </div>
-                )}
+            {/* Chart Section */}
+            <div className="bg-[#1E293B]/50 backdrop-blur-md p-6 rounded-2xl border border-white/5 shadow-xl">
+                <h3 className="text-lg font-bold text-slate-200 mb-6 flex items-center gap-2">
+                    <FiActivity className="text-cyan-400" /> Biểu đồ so sánh Doanh thu & Chi phí (30 ngày)
+                </h3>
+                <div className="w-full h-[450px]">
+                    {mergedChartData.length > 0 ? (
+                        <LineChartComponent rawData={mergedChartData} />
+                    ) : (
+                        <div className="flex flex-col items-center justify-center h-full text-slate-500">
+                            <FiBarChart2 size={48} className="mb-4 opacity-50" />
+                            <div className="text-lg font-medium">Chưa có dữ liệu biểu đồ</div>
+                            <p className="text-sm mt-1">Dữ liệu sẽ hiển thị khi có giao dịch phát sinh</p>
+                        </div>
+                    )}
+                </div>
             </div>
 
         </div>

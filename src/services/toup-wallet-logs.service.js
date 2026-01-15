@@ -1,18 +1,17 @@
 import api from "@/utils/axios";
 
-const token = () => localStorage.getItem("token");
+
 
 // Lấy danh sách log
-export const getListLogs = async (page) => {
+export const getListLogs = async (page, search) => {
   let urlAPI = `/api/toup-wallet-log`;
-  if (page) urlAPI += `?page=${page}`;
+  const params = [];
+  if (page) params.push(`page=${page}`);
+  if (search) params.push(`search=${search}`);
 
-  const result = await api.get(urlAPI, {
-    headers: {
-      Authorization: `Bearer ${token()}`,
-    },
-  });
+  if (params.length > 0) urlAPI += `?${params.join('&')}`;
 
+  const result = await api.get(urlAPI);
   return result.data;
 };
 
@@ -21,12 +20,7 @@ export const getListLogsPending = async (page) => {
   let urlAPI = `/api/toup-wallet-log/pending`;
   if (page) urlAPI += `?page=${page}`;
 
-  const result = await api.get(urlAPI, {
-    headers: {
-      Authorization: `Bearer ${token()}`,
-    },
-  });
-
+  const result = await api.get(urlAPI);
   return result.data;
 };
 
@@ -35,12 +29,7 @@ export const manualChargeBalance = async (id, newStatus) => {
   const urlAPI = `/api/toup-wallet-log/update?id=${id}`;
   const result = await api.patch(
     urlAPI,
-    { newStatus },
-    {
-      headers: {
-        Authorization: `Bearer ${token()}`,
-      },
-    }
+    { newStatus }
   );
 
   return result.data;
@@ -51,12 +40,7 @@ export const getTopupStats = async (user_id = null) => {
   let urlAPI = `/api/toup-wallet-log/getTongtien`;
   if (user_id) urlAPI += `?user_id=${user_id}`;
 
-  const result = await api.get(urlAPI, {
-    headers: {
-      Authorization: `Bearer ${token()}`,
-    },
-  });
-
+  const result = await api.get(urlAPI);
   return result.data;
 };
 
@@ -67,22 +51,13 @@ export const getTopupTotalInRange = async ({ from, to, user_id = null }) => {
   let urlAPI = `/api/wallet/tong-tien-trong-khoang?from=${from}&to=${to}`;
   if (user_id) urlAPI += `&user_id=${user_id}`;
 
-  const result = await api.get(urlAPI, {
-    headers: {
-      Authorization: `Bearer ${token()}`,
-    },
-  });
-
+  const result = await api.get(urlAPI);
   return result.data;
 };
 
-export const getLogByUser = async(page=1)=>{
-  let urlAPI = `/api/toup-wallet-log/user?page=${page}`;
+export const getLogByUser = async (page = 1) => {
+  let urlAPI = `/api/toup-wallet-log/user-logs?page=${page}`;
 
-  const result = await api.get(urlAPI, {
-    headers: {
-      Authorization: `Bearer ${token()}`,
-    },
-  });
+  const result = await api.get(urlAPI);
   return result.data
 }

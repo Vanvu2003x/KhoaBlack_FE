@@ -7,7 +7,7 @@ export async function getAllAcc(game_id, keyword, min, max, page = 1, limit = 10
       throw new Error("game_id bắt buộc phải có");
     }
 
-    let url = `/api/acc/game?`; 
+    let url = `/api/acc/game?`;
     const params = [
       `game_id=${encodeURIComponent(game_id)}`,
       `page=${encodeURIComponent(page)}`,
@@ -31,11 +31,9 @@ export async function getAllAcc(game_id, keyword, min, max, page = 1, limit = 10
 // Thêm account mới
 export async function addAcc(formData) {
   try {
-    const token = localStorage.getItem("token");
     const res = await api.post("/api/acc", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
-        "Authorization": `Bearer ${token}`,
       },
     });
     return res.data;
@@ -48,11 +46,9 @@ export async function addAcc(formData) {
 // Cập nhật account
 export async function updateAcc(id, formData) {
   try {
-    const token = localStorage.getItem("token");
     const res = await api.put(`/api/acc/${id}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
-        "Authorization": `Bearer ${token}`,
       },
     });
     return res.data;
@@ -65,12 +61,7 @@ export async function updateAcc(id, formData) {
 // Xóa account
 export async function deleteAcc(id) {
   try {
-    const token = localStorage.getItem("token");
-    const res = await api.delete(`/api/acc/${id}`, {
-      headers: {
-        "Authorization": `Bearer ${token}`,
-      },
-    });
+    const res = await api.delete(`/api/acc/${id}`);
     return res.data;
   } catch (err) {
     console.error("Error in deleteAcc:", err);
