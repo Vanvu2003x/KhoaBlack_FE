@@ -1,11 +1,13 @@
 "use client";
 import { sendAdminOTP, verifyAdminOTP } from "@/services/auth.service";
-import { changeBalance, changeRole, getAllUserByKeyword } from "@/services/user.service";
+import { changeBalance, changeRole, getAllUserByKeyword, toggleUserLock } from "@/services/user.service";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { useToast } from "@/components/ui/Toast";
 import { FiUsers, FiSearch, FiShield, FiMoreVertical, FiCreditCard, FiLock, FiUnlock, FiMail, FiCalendar, FiDollarSign } from 'react-icons/fi';
 
+
 export default function UserList() {
+    const toast = useToast();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -33,7 +35,7 @@ export default function UserList() {
                 if (res.success) {
                     const usersWithLock = res.users.map((u) => ({
                         ...u,
-                        locked: u.locked ?? false,
+                        locked: u.status === 'banned', // Map status to locked
                     }));
                     setUsers(usersWithLock);
 
@@ -94,9 +96,18 @@ export default function UserList() {
             return;
         }
         const { id, type } = pendingAction;
-        const amount = amounts[id];
-        if (!amount || amount <= 0) {
+        const amountStr = amounts[id];
+        const amount = Number(amountStr);
+
+        if (!amountStr || amount <= 0 || isNaN(amount)) {
             toast.error("Số tiền không hợp lệ");
+            return;
+        }
+
+        // Check balance for debit
+        const user = users.find(u => u.id === id);
+        if (type === "debit" && user && user.balance < amount) {
+            toast.error(`Số dư không đủ! Số dư hiện tại: ${user.balance.toLocaleString('vi-VN')} VND`);
             return;
         }
 
@@ -106,11 +117,14 @@ export default function UserList() {
             const res = await verifyAdminOTP(otp);
             if (res.status !== "ok") {
                 toast.error("OTP không hợp lệ hoặc đã hết hạn");
+                setIsProcessing(false);
                 return;
             }
 
+            // Call balance update API
             await changeBalance(id, amount, type);
 
+            // Update UI
             setUsers((prevUsers) =>
                 prevUsers.map((u) =>
                     u.id === id
@@ -125,11 +139,29 @@ export default function UserList() {
                 )
             );
 
-            toast.success(type === "credit" ? "Cộng tiền thành công" : "Trừ tiền thành công");
+            // Clear input and close modal
+            setAmounts((prev) => ({
+                ...prev,
+                [id]: ""
+            }));
+
+            toast.success(type === "credit" ? `Đã cộng ${amount.toLocaleString('vi-VN')} VND` : `Đã trừ ${amount.toLocaleString('vi-VN')} VND`);
             setShowOtpModal(false);
             setPendingAction(null);
+            setOtp("");
         } catch (error) {
-            toast.error("OTP không hợp lệ");
+            console.error("Balance update error:", error);
+            const errorMsg = error.response?.data?.message;
+
+            if (errorMsg?.includes("OTP")) {
+                toast.error("OTP không hợp lệ hoặc đã hết hạn");
+            } else if (errorMsg?.includes("số dư") || errorMsg?.includes("balance")) {
+                toast.error("Số dư không đủ để thực hiện giao dịch");
+            } else if (error.response?.status >= 500) {
+                toast.error("Lỗi server, vui lòng thử lại sau");
+            } else {
+                toast.error(errorMsg || "Lỗi khi cập nhật số dư");
+            }
         } finally {
             setIsProcessing(false);
         }
@@ -139,10 +171,11 @@ export default function UserList() {
         const user = users.find((u) => u.id === id);
         if (!user || user.locked) return;
 
+        // Toggle between user and agent
         const newRole = user.role === "user" ? "agent" : "user";
         try {
             await changeRole(user.id, newRole);
-            toast.success("Cấp quyền thành công");
+            toast.success(`Đã ${newRole === 'agent' ? 'thăng cấp lên Agent' : 'hạ cấp xuống User'}`);
 
             setUsers((prevUsers) =>
                 prevUsers.map((u) =>
@@ -150,9 +183,48 @@ export default function UserList() {
                 )
             );
         } catch (error) {
-            toast.error("Cấp quyền thất bại");
+            toast.error("Thay đổi quyền thất bại");
         }
     }
+
+    async function handleUpgradeToAdmin(id) {
+        const user = users.find((u) => u.id === id);
+        try {
+            await changeRole(user.id, "admin");
+            toast.success("Thăng cấp Admin thành công");
+
+            setUsers((prevUsers) =>
+                prevUsers.map((u) =>
+                    u.id === id ? { ...u, role: "admin" } : u
+                )
+            );
+        } catch (error) {
+            toast.error("Thăng cấp Admin thất bại");
+        }
+    }
+
+    async function handleToggleLock(id) {
+        const user = users.find((u) => u.id === id);
+        if (!user) return;
+
+        try {
+            const result = await toggleUserLock(id);
+            if (result.success) {
+                const newLockedState = result.locked;
+                setUsers((prevUsers) =>
+                    prevUsers.map((u) =>
+                        u.id === id ? { ...u, locked: newLockedState, status: newLockedState ? 'banned' : 'active' } : u
+                    )
+                );
+                toast.success(newLockedState ? "Đã khóa tài khoản" : "Đã mở khóa tài khoản");
+            } else {
+                toast.error(result.message || "Không thể thay đổi trạng thái khóa");
+            }
+        } catch (error) {
+            toast.error("Lỗi khi thay đổi trạng thái khóa");
+        }
+    }
+
 
     if (loading) return (
         <div className="flex justify-center items-center py-20">
@@ -230,8 +302,8 @@ export default function UserList() {
                                         {user.name}
                                         {user.locked && <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400 uppercase border border-red-500/30">LOCKED</span>}
                                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${user.role === 'admin' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' :
-                                                user.role === 'agent' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
-                                                    'bg-slate-700/30 text-slate-400 border-slate-600/30'
+                                            user.role === 'agent' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
+                                                'bg-slate-700/30 text-slate-400 border-slate-600/30'
                                             }`}>
                                             {user.role}
                                         </span>
@@ -246,22 +318,55 @@ export default function UserList() {
                             </div>
 
                             <div className="flex flex-wrap items-center gap-2 mt-4 md:mt-0">
-                                {(user.role === "user" || user.role === "agent") && (
+                                {/* Role Management Buttons */}
+                                {user.role === 'user' && (
+                                    <button
+                                        onClick={() => handleChangeRole(user.id)}
+                                        disabled={user.locked}
+                                        className="px-3 py-1.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 transition-colors text-xs font-bold disabled:opacity-50"
+                                    >
+                                        Thăng cấp Agent
+                                    </button>
+                                )}
+                                {user.role === 'agent' && (
                                     <>
                                         <button
                                             onClick={() => handleChangeRole(user.id)}
                                             disabled={user.locked}
-                                            className="px-3 py-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 transition-colors text-xs font-bold"
+                                            className="px-3 py-1.5 rounded-lg bg-slate-500/10 text-slate-400 border border-slate-500/20 hover:bg-slate-500/20 transition-colors text-xs font-bold disabled:opacity-50"
                                         >
-                                            {user.role === "user" ? "Thăng cấp Đại lý" : "Hạ cấp User"}
+                                            Hạ cấp User
                                         </button>
                                         <button
-                                            onClick={() => toggleExpand(user.id)}
-                                            className="px-3 py-1.5 rounded-lg bg-slate-700/30 text-slate-300 border border-slate-600/30 hover:bg-slate-700/50 transition-colors text-xs font-bold flex items-center gap-1"
+                                            onClick={() => handleUpgradeToAdmin(user.id)}
+                                            disabled={user.locked}
+                                            className="px-3 py-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 transition-colors text-xs font-bold disabled:opacity-50"
                                         >
-                                            <FiMoreVertical /> {expandedIds.includes(user.id) ? "Thu gọn" : "Chi tiết"}
+                                            Thăng cấp Admin
                                         </button>
                                     </>
+                                )}
+
+                                {/* Chi tiết button for ALL users */}
+                                <button
+                                    onClick={() => toggleExpand(user.id)}
+                                    className="px-3 py-1.5 rounded-lg bg-slate-700/30 text-slate-300 border border-slate-600/30 hover:bg-slate-700/50 transition-colors text-xs font-bold flex items-center gap-1"
+                                >
+                                    <FiMoreVertical /> {expandedIds.includes(user.id) ? "Thu gọn" : "Chi tiết"}
+                                </button>
+
+                                {/* Lock button only for user/agent */}
+                                {(user.role === "user" || user.role === "agent") && (
+                                    <button
+                                        onClick={() => handleToggleLock(user.id)}
+                                        disabled={isProcessing}
+                                        className={`px-3 py-1.5 rounded-lg transition-colors text-xs font-bold flex items-center gap-1 ${user.locked
+                                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20"
+                                            : "bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20"
+                                            }`}
+                                    >
+                                        {user.locked ? <><FiUnlock /> Mở khóa</> : <><FiLock /> Khóa TK</>}
+                                    </button>
                                 )}
                             </div>
                         </div>
@@ -272,56 +377,57 @@ export default function UserList() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm mb-6">
                                     <div className="bg-[#0F172A] p-3 rounded-xl border border-white/5">
                                         <span className="text-slate-500 text-xs block mb-1">Ngày tham gia</span>
-                                        <span className="text-slate-200 flex items-center gap-2"><FiCalendar className="text-slate-500" /> {new Date(user.create_at).toLocaleDateString('vi-VN')}</span>
+                                        <span className="text-slate-200 flex items-center gap-2">
+                                            <FiCalendar className="text-slate-500" />
+                                            {user.created_at ? new Date(user.created_at).toLocaleDateString('vi-VN') : 'Chưa có dữ liệu'}
+                                        </span>
                                     </div>
                                     <div className="bg-[#0F172A] p-3 rounded-xl border border-white/5">
                                         <span className="text-slate-500 text-xs block mb-1">Tổng nạp</span>
-                                        <span className="text-emerald-400 font-bold">{Number(user.tong_amount).toLocaleString('vi-VN')} đ</span>
+                                        <span className="text-emerald-400 font-bold">{(Number(user.tong_amount) || 0).toLocaleString('vi-VN')} đ</span>
                                     </div>
                                     <div className="bg-[#0F172A] p-3 rounded-xl border border-white/5">
                                         <span className="text-slate-500 text-xs block mb-1">Thống kê đơn</span>
                                         <div className="flex gap-3 text-xs">
-                                            <span className="text-blue-400">Mua: {user.so_don_da_mua}</span>
-                                            <span className="text-purple-400">Order: {user.so_don_order}</span>
+                                            <span className="text-blue-400">Mua: {user.so_don_order || 0}</span>
+                                            <span className="text-purple-400">Nạp: {user.so_don_da_nap || 0}</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Money Actions */}
-                                {(user.role === "user" || user.role === "agent") && (
-                                    <div className="bg-[#0F172A]/50 p-4 rounded-xl border border-dashed border-slate-700">
-                                        <h4 className="text-slate-400 text-xs font-bold uppercase mb-3 flex items-center gap-2">
-                                            <FiCreditCard /> Điều chỉnh số dư
-                                        </h4>
-                                        <div className="flex flex-wrap gap-2">
-                                            <div className="relative flex-1 min-w-[150px]">
-                                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs font-bold">VND</span>
-                                                <input
-                                                    type="text"
-                                                    inputMode="numeric"
-                                                    value={amounts[user.id] ?? ""}
-                                                    onChange={(e) => handleAmountChange(user.id, e.target.value)}
-                                                    className="w-full bg-[#0F172A] border border-slate-700 rounded-lg pl-10 pr-4 py-2 text-slate-200 focus:outline-none focus:border-cyan-500 transition-colors"
-                                                    placeholder="Nhập số tiền..."
-                                                />
-                                            </div>
-                                            <button
-                                                onClick={() => handleOpenOtpModal(user.id, "credit")}
-                                                disabled={user.locked || isProcessing}
-                                                className="px-4 py-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg hover:bg-emerald-500/20 font-bold transition-colors disabled:opacity-50"
-                                            >
-                                                + Cộng
-                                            </button>
-                                            <button
-                                                onClick={() => handleOpenOtpModal(user.id, "debit")}
-                                                disabled={user.locked || isProcessing}
-                                                className="px-4 py-2 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-lg hover:bg-rose-500/20 font-bold transition-colors disabled:opacity-50"
-                                            >
-                                                - Trừ
-                                            </button>
+                                {/* Money Actions - available for all roles */}
+                                <div className="bg-[#0F172A]/50 p-4 rounded-xl border border-dashed border-slate-700">
+                                    <h4 className="text-slate-400 text-xs font-bold uppercase mb-3 flex items-center gap-2">
+                                        <FiCreditCard /> Điều chỉnh số dư
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        <div className="relative flex-1 min-w-[150px]">
+                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs font-bold">VND</span>
+                                            <input
+                                                type="text"
+                                                inputMode="numeric"
+                                                value={amounts[user.id] ?? ""}
+                                                onChange={(e) => handleAmountChange(user.id, e.target.value)}
+                                                className="w-full bg-[#0F172A] border border-slate-700 rounded-lg pl-10 pr-4 py-2 text-slate-200 focus:outline-none focus:border-cyan-500 transition-colors"
+                                                placeholder="Nhập số tiền..."
+                                            />
                                         </div>
+                                        <button
+                                            onClick={() => handleOpenOtpModal(user.id, "credit")}
+                                            disabled={isProcessing}
+                                            className="px-4 py-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg hover:bg-emerald-500/20 font-bold transition-colors disabled:opacity-50"
+                                        >
+                                            + Cộng
+                                        </button>
+                                        <button
+                                            onClick={() => handleOpenOtpModal(user.id, "debit")}
+                                            disabled={isProcessing}
+                                            className="px-4 py-2 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-lg hover:bg-rose-500/20 font-bold transition-colors disabled:opacity-50"
+                                        >
+                                            - Trừ
+                                        </button>
                                     </div>
-                                )}
+                                </div>
                             </div>
                         )}
                     </div>

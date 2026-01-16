@@ -1,10 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
-import Stat from "@/components/admin/stat";
+import { FiBarChart2, FiTrendingUp, FiTrendingDown, FiDollarSign, FiActivity, FiDownload } from "react-icons/fi";
+import StatCard from "@/components/admin/revenueManager/StatCard";
 import LineChartComponent from "@/components/admin/revenueManager/chart";
+import ProfitMarginChart from "@/components/admin/revenueManager/ProfitMarginChart";
+import PeriodSelector from "@/components/admin/revenueManager/PeriodSelector";
+import GrowthIndicator from "@/components/admin/revenueManager/GrowthIndicator";
+import TopSourcesWidget from "@/components/admin/revenueManager/TopSourcesWidget";
 import { getTopupStats } from "@/services/toup-wallet-logs.service";
 import { getOrderStatistics } from "@/services/order.service";
-import { FiBarChart2, FiTrendingUp, FiTrendingDown, FiDollarSign, FiActivity } from "react-icons/fi";
+import { getProfitMargin, getGrowthRates, getTopRevenueSources } from "@/services/revenue.service";
 
 const formatCurrency = (value) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -16,40 +21,71 @@ const formatCurrency = (value) => {
 };
 
 export default function RevenueManagerPage() {
+    // Revenue state
     const [TotalRevenue, setTotalRevenue] = useState(0);
     const [TotalRevenueThisMonth, setTotalRevenueThisMonth] = useState(0);
     const [TotalRevenueThisDay, setTotalRevenueThisDay] = useState(0);
     const [TotalRevenueByDate, setTotalRevenueByDate] = useState([]);
 
+    // Cost state
     const [TotalCost, setTotalCost] = useState(0);
     const [TotalCostThisMonth, setTotalCostThisMonth] = useState(0);
-    const [TotalCostThisDay, setTotalCostThisDay] = useState(0)
+    const [TotalCostThisDay, setTotalCostThisDay] = useState(0);
     const [TotalCostByDate, setTotalCostByDate] = useState([]);
 
+    // Profit & Analytics state
+    const [profitData, setProfitData] = useState(null);
+    const [growthData, setGrowthData] = useState(null);
+    const [topSources, setTopSources] = useState([]);
+
+    // UI state
+    const [period, setPeriod] = useState('daily');
     const [mergedChartData, setMergedChartData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             try {
-                const data = await getTopupStats();
-                if (data.status) {
-                    setTotalRevenue(data.tong_tien_da_nap);
-                    setTotalRevenueThisMonth(data.tong_tien_thang_nay);
-                    setTotalRevenueThisDay(data.tong_tien_hom_nay);
-                    setTotalRevenueByDate(data.thong_ke_30_ngay || []);
+                // Fetch revenue data
+                const revenueData = await getTopupStats();
+                if (revenueData.status) {
+                    setTotalRevenue(revenueData.tong_tien_da_nap);
+                    setTotalRevenueThisMonth(revenueData.tong_tien_thang_nay);
+                    setTotalRevenueThisDay(revenueData.tong_tien_hom_nay);
+                    setTotalRevenueByDate(revenueData.thong_ke_30_ngay || []);
                 }
 
-                const data2 = await getOrderStatistics();
-                if (data2) {
-                    setTotalCost(data2.total_cost)
-                    setTotalCostThisMonth(data2.total_cost_this_month)
-                    setTotalCostThisDay(data2.total_cost_today)
+                // Fetch cost data
+                const costData = await getOrderStatistics();
+                if (costData) {
+                    setTotalCost(costData.total_cost);
+                    setTotalCostThisMonth(costData.total_cost_this_month);
+                    setTotalCostThisDay(costData.total_cost_today);
+                    setTotalCostByDate(costData.last_30_days || []);
+                }
 
-                    setTotalCostByDate(data2.last_30_days)
-                    console.log(data2)
+                // Fetch profit margin data
+                const profit = await getProfitMargin();
+                if (profit.status) {
+                    setProfitData(profit);
+                }
+
+                // Fetch growth rates
+                const growth = await getGrowthRates();
+                if (growth.status) {
+                    setGrowthData(growth);
+                }
+
+                // Fetch top revenue sources
+                const sources = await getTopRevenueSources(5);
+                if (sources.status) {
+                    setTopSources(sources.top_sources || []);
                 }
             } catch (error) {
                 console.error("Lỗi khi lấy dữ liệu thống kê:", error);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -86,82 +122,164 @@ export default function RevenueManagerPage() {
         setMergedChartData(merged);
     }, [TotalRevenueByDate, TotalCostByDate]);
 
-
+    const totalProfit = profitData ? profitData.total.profit : TotalRevenue - TotalCost;
+    const monthProfit = profitData ? profitData.this_month.profit : TotalRevenueThisMonth - TotalCostThisMonth;
+    const todayProfit = profitData ? profitData.today.profit : TotalRevenueThisDay - TotalCostThisDay;
 
     return (
         <div className="space-y-6 animate-[fadeIn_0.5s_ease-out]">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#1E293B]/50 backdrop-blur-xl p-6 rounded-2xl border border-white/5 shadow-xl">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-gradient-to-r from-[#1E293B]/80 via-[#1E293B]/60 to-[#1E293B]/80 backdrop-blur-xl p-6 rounded-2xl border border-white/10 shadow-2xl">
                 <div>
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent flex items-center gap-2">
-                        <FiBarChart2 className="text-teal-400" /> Báo cáo Doanh thu
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent flex items-center gap-3">
+                        <FiBarChart2 className="text-cyan-400" size={32} />
+                        Báo cáo Doanh thu & Lợi nhuận
                     </h1>
-                    <p className="text-slate-400 text-sm mt-1">
-                        Thống kê chi tiết doanh thu và chi phí
-                    </p>
+                    <div className="text-slate-400 text-sm mt-2 flex items-center gap-2">
+                        Thống kê chi tiết doanh thu, chi phí và lợi nhuận
+                        {growthData && (
+                            <GrowthIndicator
+                                value={growthData.monthly.growth_rate}
+                                label="so với tháng trước"
+                            />
+                        )}
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <PeriodSelector value={period} onChange={setPeriod} />
+                    <button className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-4 py-2 rounded-xl font-medium transition-all duration-300 shadow-lg hover:shadow-xl">
+                        <FiDownload size={18} />
+                        Xuất báo cáo
+                    </button>
                 </div>
             </div>
 
-            {/* Revenue Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Stat
-                    className={"!bg-[#1E293B]/50 border-blue-500/50 text-blue-400 hover:bg-blue-500/10"}
+            {/* Key Metrics - Revenue & Profit */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <StatCard
                     title="Tổng doanh thu"
-                    info={formatCurrency(TotalRevenue)}
-                    icon={<FiDollarSign className="text-blue-500" size={24} />}
+                    value={TotalRevenue}
+                    icon={<FiDollarSign size={28} />}
+                    gradient="from-blue-500/20 to-cyan-500/20"
+                    iconColor="text-blue-400"
+                    borderColor="border-blue-500/50"
+                    trend={growthData?.monthly.growth_rate}
                 />
-                <Stat
-                    className={"!bg-[#1E293B]/50 border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"}
+                <StatCard
                     title="Doanh thu tháng này"
-                    info={formatCurrency(TotalRevenueThisMonth)}
-                    icon={<FiTrendingUp className="text-cyan-500" size={24} />}
+                    value={TotalRevenueThisMonth}
+                    icon={<FiTrendingUp size={28} />}
+                    gradient="from-cyan-500/20 to-teal-500/20"
+                    iconColor="text-cyan-400"
+                    borderColor="border-cyan-500/50"
+                    trend={growthData?.daily.growth_rate}
                 />
-                <Stat
-                    className={"!bg-[#1E293B]/50 border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10"}
-                    title="Doanh thu hôm nay"
-                    info={formatCurrency(TotalRevenueThisDay)}
-                    icon={<FiActivity className="text-emerald-500" size={24} />}
+                <StatCard
+                    title="Lợi nhuận tháng này"
+                    value={monthProfit}
+                    icon={<FiActivity size={28} />}
+                    gradient="from-emerald-500/20 to-green-500/20"
+                    iconColor="text-emerald-400"
+                    borderColor="border-emerald-500/50"
+                    trend={profitData?.this_month.margin_percent}
+                />
+                <StatCard
+                    title="Lợi nhuận hôm nay"
+                    value={todayProfit}
+                    icon={<FiTrendingUp size={28} />}
+                    gradient="from-amber-500/20 to-orange-500/20"
+                    iconColor="text-amber-400"
+                    borderColor="border-amber-500/50"
+                    trend={profitData?.today.margin_percent}
                 />
             </div>
 
-            {/* Cost Stats */}
+            {/* Main Chart & Top Sources */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Revenue vs Cost Chart */}
+                <div className="lg:col-span-2 bg-[#1E293B]/50 backdrop-blur-xl p-6 rounded-2xl border border-white/5 shadow-xl">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg font-bold text-slate-200 flex items-center gap-2">
+                            <FiActivity className="text-cyan-400" />
+                            Biểu đồ Doanh thu & Chi phí (30 ngày)
+                        </h3>
+                    </div>
+                    <div className="w-full h-[400px]">
+                        {mergedChartData.length > 0 ? (
+                            <LineChartComponent rawData={mergedChartData} />
+                        ) : (
+                            <div className="flex flex-col items-center justify-center h-full text-slate-500">
+                                <FiBarChart2 size={48} className="mb-4 opacity-50 animate-pulse" />
+                                <div className="text-lg font-medium">Đang tải dữ liệu...</div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Top Revenue Sources */}
+                <div className="lg:col-span-1">
+                    <TopSourcesWidget sources={topSources} loading={loading} />
+                </div>
+            </div>
+
+            {/* Cost Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Stat
-                    className={"!bg-[#1E293B]/50 border-rose-500/50 text-rose-400 hover:bg-rose-500/10"}
+                <StatCard
                     title="Tổng chi phí"
-                    info={formatCurrency(TotalCost)}
-                    icon={<FiTrendingDown className="text-rose-500" size={24} />}
+                    value={TotalCost}
+                    icon={<FiTrendingDown size={28} />}
+                    gradient="from-rose-500/20 to-pink-500/20"
+                    iconColor="text-rose-400"
+                    borderColor="border-rose-500/50"
                 />
-                <Stat
-                    className={"!bg-[#1E293B]/50 border-orange-500/50 text-orange-400 hover:bg-orange-500/10"}
+                <StatCard
                     title="Chi phí tháng này"
-                    info={formatCurrency(TotalCostThisMonth)}
+                    value={TotalCostThisMonth}
+                    icon={<FiDollarSign size={28} />}
+                    gradient="from-orange-500/20 to-red-500/20"
+                    iconColor="text-orange-400"
+                    borderColor="border-orange-500/50"
                 />
-                <Stat
-                    className={"!bg-[#1E293B]/50 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10"}
+                <StatCard
                     title="Chi phí hôm nay"
-                    info={formatCurrency(TotalCostThisDay)}
+                    value={TotalCostThisDay}
+                    icon={<FiActivity size={28} />}
+                    gradient="from-yellow-500/20 to-amber-500/20"
+                    iconColor="text-yellow-400"
+                    borderColor="border-yellow-500/50"
                 />
             </div>
 
-            {/* Chart Section */}
-            <div className="bg-[#1E293B]/50 backdrop-blur-md p-6 rounded-2xl border border-white/5 shadow-xl">
-                <h3 className="text-lg font-bold text-slate-200 mb-6 flex items-center gap-2">
-                    <FiActivity className="text-cyan-400" /> Biểu đồ so sánh Doanh thu & Chi phí (30 ngày)
-                </h3>
+            {/* Profit Margin Chart */}
+            <div className="bg-[#1E293B]/50 backdrop-blur-xl p-6 rounded-2xl border border-white/5 shadow-xl">
+                <div className="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 className="text-lg font-bold text-slate-200 flex items-center gap-2">
+                            <FiTrendingUp className="text-amber-400" />
+                            Biểu đồ Lợi nhuận (30 ngày)
+                        </h3>
+                        {profitData && (
+                            <p className="text-sm text-slate-400 mt-1">
+                                Tỷ suất lợi nhuận tháng này:
+                                <span className={`ml-2 font-bold ${profitData.this_month.margin_percent >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                    {profitData.this_month.margin_percent.toFixed(2)}%
+                                </span>
+                            </p>
+                        )}
+                    </div>
+                </div>
                 <div className="w-full h-[450px]">
                     {mergedChartData.length > 0 ? (
-                        <LineChartComponent rawData={mergedChartData} />
+                        <ProfitMarginChart rawData={mergedChartData} />
                     ) : (
                         <div className="flex flex-col items-center justify-center h-full text-slate-500">
-                            <FiBarChart2 size={48} className="mb-4 opacity-50" />
-                            <div className="text-lg font-medium">Chưa có dữ liệu biểu đồ</div>
-                            <p className="text-sm mt-1">Dữ liệu sẽ hiển thị khi có giao dịch phát sinh</p>
+                            <FiBarChart2 size={48} className="mb-4 opacity-50 animate-pulse" />
+                            <div className="text-lg font-medium">Đang tải dữ liệu...</div>
                         </div>
                     )}
                 </div>
             </div>
-
         </div>
     );
 }

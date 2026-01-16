@@ -36,3 +36,9 @@ export async function getFinancialSummary() {
   const response = await api.get(`/api/order/financial-summary`);
   return response.data;
 }
+
+// ✅ Khóa/mở khóa tài khoản
+export async function toggleUserLock(userId) {
+  const response = await api.patch(`/api/user/${userId}/toggle-lock`);
+  return response.data;
+}
