@@ -12,32 +12,23 @@ export const getGamesByType = async (type) => {
 
 
 export const createGame = async (formData) => {
-  const token = localStorage.getItem("token");
   const res = await api.post("/api/games/upload", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
-      Authorization: `Bearer ${token}`,
     },
   });
   return res.data;
 };
 
 export const deleteGame = async (id) => {
-  const token = localStorage.getItem("token");
-  const res = await api.delete(`/api/games/delete?id=${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const res = await api.delete(`/api/games/delete?id=${id}`);
   return res.data;
 };
 
 export const updateGame = async (id, formData) => {
-  const token = localStorage.getItem("token");
   const res = await api.patch(`/api/games/update?id=${id}`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
-      Authorization: `Bearer ${token}`,
     },
   });
   return res.data;

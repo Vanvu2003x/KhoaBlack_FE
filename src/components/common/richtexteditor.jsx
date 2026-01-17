@@ -5,6 +5,7 @@ import { useEditor, EditorContent } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import TextStyle, { TextStyleKit } from "@tiptap/extension-text-style"
 import Color from "@tiptap/extension-color"
+import { FiBold, FiItalic, FiUnderline } from "react-icons/fi"
 
 export default function RichTextEditor({ value = "", onChange }) {
     const [content, setContent] = useState(value)
@@ -17,53 +18,64 @@ export default function RichTextEditor({ value = "", onChange }) {
             setContent(html)
             onChange && onChange(html)
         },
-        immediatelyRender: false // tránh SSR mismatch
+        editorProps: {
+            attributes: {
+                class: 'prose prose-invert max-w-none focus:outline-none min-h-[150px] p-3 text-slate-200'
+            }
+        },
+        immediatelyRender: false
     })
 
     if (!editor) return null
 
     return (
-        <div>
+        <div className="bg-[#0F172A] border border-white/10 rounded-xl overflow-hidden">
             {/* Toolbar */}
-            <div className="mb-2 flex gap-2">
+            <div className="flex items-center gap-1 p-2 border-b border-white/10 bg-slate-900/50">
                 <button
                     type="button"
                     onClick={() => editor.chain().focus().toggleBold().run()}
-                    className="font-bold border px-2 py-1 rounded hover:bg-gray-100"
+                    className={`p-2 rounded-lg transition-colors font-bold ${editor.isActive('bold') ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'}`}
+                    title="Bold"
                 >
                     B
                 </button>
                 <button
                     type="button"
                     onClick={() => editor.chain().focus().toggleItalic().run()}
-                    className="italic border px-2 py-1 rounded hover:bg-gray-100"
+                    className={`p-2 rounded-lg transition-colors italic ${editor.isActive('italic') ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'}`}
+                    title="Italic"
                 >
                     I
                 </button>
                 <button
                     type="button"
                     onClick={() => editor.chain().focus().toggleStrike().run()}
-                    className="line-through border px-2 py-1 rounded hover:bg-gray-100"
+                    className={`p-2 rounded-lg transition-colors line-through ${editor.isActive('strike') ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'}`}
+                    title="Strike"
                 >
                     S
                 </button>
+                <div className="w-px h-6 bg-white/10 mx-2"></div>
                 <input
                     type="color"
                     onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
-                    className="w-10 h-10 border rounded cursor-pointer"
+                    className="w-8 h-8 rounded cursor-pointer bg-transparent border-none"
+                    title="Text Color"
                 />
             </div>
 
             {/* Editor */}
-            <EditorContent editor={editor} className="min-h-[150px] border p-2 rounded" />
+            <EditorContent editor={editor} className="" />
 
-            {/* Preview HTML */}
-            <div className="mt-4">
-                <label className="block font-medium mb-1">Preview:</label>
+            {/* Preview HTML (Optional - keep but styled) */}
+            <div className="p-3 border-t border-white/10 bg-slate-900/30">
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Preview (HTML):</label>
                 <div
-                    className="border p-2 min-h-[100px] rounded bg-gray-50"
-                    dangerouslySetInnerHTML={{ __html: content }}
-                />
+                    className="p-3 rounded-lg bg-[#020617] border border-white/5 text-slate-400 text-xs font-mono break-all max-h-32 overflow-y-auto custom-scrollbar"
+                >
+                    {content}
+                </div>
             </div>
         </div>
     )

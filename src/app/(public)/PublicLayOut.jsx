@@ -2,8 +2,8 @@
 
 import { BsMessenger } from "react-icons/bs"
 import { SiZalo } from "react-icons/si"
-import Footer from "@/components/footer"
-import Header from "@/components/header"
+import Footer from "@/components/layout/Footer"
+import Header from "@/components/layout/Header"
 import { useEffect, useState } from "react"
 
 export default function PublicLayout({ children }) {
