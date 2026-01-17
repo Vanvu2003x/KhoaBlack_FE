@@ -4,7 +4,7 @@ let socket = null;
 
 export const connectSocket = (token, onBalanceUpdate) => {
   // Token is ignored as we use cookies now
-  const URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const URL = process.env.NEXT_PUBLIC_API_URL;
 
   if (!socket) {
     socket = io(URL, {
