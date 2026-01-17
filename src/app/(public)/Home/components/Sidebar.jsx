@@ -119,7 +119,7 @@ export default function Sidebar() {
                                 <div className="w-10 h-10 rounded-lg bg-[#0F172A] border border-white/10 flex items-center justify-center overflow-hidden shrink-0 group-hover:border-purple-500/50 transition-colors">
                                     {(pack.thumbnail || pack.game_image) ? (
                                         <img
-                                            src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${pack.thumbnail || pack.game_image}`}
+                                            src={`${process.env.NEXT_PUBLIC_API_URL}${pack.thumbnail || pack.game_image}`}
                                             alt={pack.package_name}
                                             className="w-full h-full object-cover"
                                         />
