@@ -11,8 +11,8 @@ export default function Footer() {
                 <div className="flex flex-col items-center md:items-start gap-4">
                     <div className="relative w-24 h-24 transition-transform hover:scale-105 duration-300">
                         <Image
-                            src="/imgs/logo.png"
-                            alt="Logo"
+                            src="/imgs/image.png"
+                            alt="KhoaBlack Topup"
                             fill
                             className="object-contain drop-shadow-lg"
                         />

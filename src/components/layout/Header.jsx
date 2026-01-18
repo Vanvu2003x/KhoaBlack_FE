@@ -122,14 +122,14 @@ export default function Header() {
                         </button>
 
                         <Link href="/" className="relative group">
-                            <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform duration-300">
-                                    <span className="text-white font-bold text-lg md:text-xl">N</span>
-                                </div>
-                                <span className="text-lg md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 block">
-                                    NEXUS<span className="text-indigo-400">PAY</span>
-                                </span>
-                            </div>
+                            <Image
+                                src="/imgs/image.png"
+                                alt="KhoaBlack Topup"
+                                width={200}
+                                height={80}
+                                className="h-12 md:h-16 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+                                priority
+                            />
                         </Link>
 
                         {/* Navigation - Desktop */}
@@ -287,12 +287,13 @@ export default function Header() {
                     <div className="p-5 flex flex-col h-full">
                         {/* Header Drawer */}
                         <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
-                            <div className="flex items-center gap-2">
-                                <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                                    <span className="text-white font-bold text-xl">N</span>
-                                </div>
-                                <span className="font-bold text-white text-lg">NEXUS<span className="text-indigo-400">PAY</span></span>
-                            </div>
+                            <Image
+                                src="/imgs/image.png"
+                                alt="KhoaBlack Topup"
+                                width={140}
+                                height={50}
+                                className="h-12 w-auto object-contain"
+                            />
                             <button
                                 onClick={() => setOpenMobileMenu(false)}
                                 className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all"

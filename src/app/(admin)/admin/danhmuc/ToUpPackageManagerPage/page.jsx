@@ -32,8 +32,6 @@ import Swal from "sweetalert2";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function TopUpPackageManagerPage() {
-    const toast = useToast();
-
     // --- State Management ---
     const [games, setGames] = useState([]);
     const [selectedGame, setSelectedGame] = useState(null);
