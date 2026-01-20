@@ -10,7 +10,15 @@ export default function PackageGrid({
     displayPackages,
     selectedPkg,
     setSelectedPkg,
+    userLevel = 1
 }) {
+    const calculatePrice = (pkg, level) => {
+        if (!level || level === 1) return pkg.price;
+        if (level === 2) return pkg.price_pro || pkg.price; // Pro
+        if (level === 3) return pkg.price_plus || pkg.price; // Plus/VIP
+        return pkg.price;
+    };
+
     return (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
             {loading
@@ -26,10 +34,14 @@ export default function PackageGrid({
                 : displayPackages.map((pkg) => {
                     const isSelected = selectedPkg?.id === pkg.id;
                     const isHot = pkg.sale; // Determine if it's a HOT package
+
+                    const finalPrice = calculatePrice(pkg, userLevel);
+                    const originalPrice = pkg.price; // For reference if needed
+
                     return (
                         <div
                             key={pkg.id}
-                            onClick={() => setSelectedPkg(pkg)}
+                            onClick={() => setSelectedPkg({ ...pkg, price: finalPrice })}
                             className={`
                                 relative cursor-pointer group transition-all duration-300 drop-shadow-xl
                                 ${isSelected ? "scale-[1.05] z-10" : "hover:-translate-y-1"}
@@ -154,6 +166,13 @@ export default function PackageGrid({
                                         ></div>
 
                                         <div className="relative pb-1">
+                                            {/* Original Price (Strikethrough) if discounted */}
+                                            {finalPrice < pkg.price && (
+                                                <div className="text-[10px] text-slate-400 font-medium line-through decoration-slate-400 absolute -top-3 left-1/2 -translate-x-1/2 w-full text-center">
+                                                    {new Intl.NumberFormat("vi-VN").format(pkg.price)} đ
+                                                </div>
+                                            )}
+
                                             <div
                                                 className={`text-xl font-black tracking-tighter drop-shadow-[0_0_10px_rgba(34,211,238,0.8)] ${isSelected
                                                     ? "text-white"
@@ -163,7 +182,7 @@ export default function PackageGrid({
                                                     }`}
                                             >
                                                 {new Intl.NumberFormat("vi-VN").format(
-                                                    pkg.price
+                                                    finalPrice
                                                 )}
                                             </div>
                                             <div

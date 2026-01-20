@@ -42,3 +42,9 @@ export async function toggleUserLock(userId) {
   const response = await api.patch(`/api/user/${userId}/toggle-lock`);
   return response.data;
 }
+
+// ✅ C cập nhật level user
+export async function updateUserLevel(userId, level) {
+  const response = await api.put(`/api/user/${userId}/level`, { level });
+  return response.data;
+}

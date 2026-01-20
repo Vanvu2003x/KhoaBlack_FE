@@ -1,7 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['https://018d436dc895.ngrok-free.app'], // thay bằng URL ngrok hiện tại
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**', // Allow all HTTPS domains for now
+      },
+    ],
+  },
+  // Fix for Next.js 15 streaming bug
+  experimental: {
+    // Disable problematic streaming features
+    ppr: false,
+  },
+  // Suppress streaming-related warnings
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
   },
 };
 

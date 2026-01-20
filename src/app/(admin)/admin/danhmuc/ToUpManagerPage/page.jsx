@@ -1,11 +1,35 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import Stat from "@/components/admin/stat";
 import OrderItem from "@/components/admin/toupManager/orderItem";
 import Pagination from "@/components/common/Pagination";
 import { getAllOrder, getAllOrderByStatus, searchOrder } from "@/services/order.service";
 import { toast } from "react-toastify";
-import { FiShoppingCart, FiSearch, FiFilter } from "react-icons/fi";
+import { FiShoppingCart, FiSearch, FiFilter, FiX, FiCreditCard, FiClock, FiLoader, FiCheckCircle, FiXCircle } from "react-icons/fi";
+
+const StatCard = ({ title, value, icon, color, bg, borderColor, active, onClick }) => (
+    <button
+        onClick={onClick}
+        className={`
+            relative overflow-hidden rounded-2xl p-4 border transition-all duration-300 group text-left w-full
+            ${active
+                ? `bg-gradient-to-br ${bg} ${borderColor} shadow-lg shadow-${color.split('-')[1]}-500/10 scale-105`
+                : 'bg-slate-900 border-slate-800 hover:border-slate-700 hover:bg-slate-800/50'}
+        `}
+    >
+        <div className="flex justify-between items-start mb-2">
+            <div className={`p-2 rounded-lg bg-slate-950/50 ${color}`}>
+                {icon}
+            </div>
+            {active && <div className={`w-2 h-2 rounded-full ${color.replace('text-', 'bg-')} animate-pulse`}></div>}
+        </div>
+        <div className="space-y-1">
+            <h3 className="text-slate-400 text-xs font-bold uppercase tracking-wider">{title}</h3>
+            <p className={`text-2xl font-black ${active ? 'text-white' : 'text-slate-200 group-hover:text-white'}`}>
+                {value}
+            </p>
+        </div>
+    </button>
+);
 
 export default function Toup() {
     const [stats, setStats] = useState({
@@ -82,68 +106,109 @@ export default function Toup() {
 
     return (
         <div className="space-y-6 animate-[fadeIn_0.5s_ease-out]">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#1E293B]/50 backdrop-blur-xl p-6 rounded-2xl border border-white/5 shadow-xl">
-                <div>
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent flex items-center gap-2">
-                        <FiShoppingCart className="text-cyan-400" /> Quản lý Đơn hàng
-                    </h1>
-                    <p className="text-slate-400 text-sm mt-1">
-                        Theo dõi và xử lý các đơn nạp tiền/game
-                    </p>
-                </div>
+            {/* Premium Header */}
+            <div className="relative overflow-hidden rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl p-8 mb-8">
+                <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl"></div>
 
-                {/* Search */}
-                <div className="relative group">
-                    <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
-                    <input
-                        type="text"
-                        value={searchKeyword}
-                        onChange={(e) => setSearchKeyword(e.target.value)}
-                        placeholder="Tìm mã đơn / email..."
-                        className="bg-[#0F172A] border border-white/10 text-slate-200 pl-10 pr-4 py-2 rounded-xl focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 w-full md:w-80 transition-all"
-                    />
+                <div className="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div>
+                        <h1 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent mb-2">
+                            Quản lý Đơn Nạp
+                        </h1>
+                        <p className="text-slate-400 font-medium flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Hệ thống xử lý đơn hàng tự động & thủ công
+                        </p>
+                    </div>
+
+                    {/* Search Bar */}
+                    <div className="relative group w-full md:w-96">
+                        <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-xl blur opacity-25 group-focus-within:opacity-75 transition duration-500"></div>
+                        <div className="relative bg-slate-900 rounded-xl p-1 flex items-center">
+                            <FiSearch className="ml-3 text-slate-400 group-focus-within:text-cyan-400 transition-colors" size={20} />
+                            <input
+                                type="text"
+                                value={searchKeyword}
+                                onChange={(e) => setSearchKeyword(e.target.value)}
+                                placeholder="Tìm kiếm theo mã đơn, email..."
+                                className="w-full bg-transparent text-white px-3 py-2 outline-none placeholder-slate-500 font-medium"
+                            />
+                            {searchKeyword && (
+                                <button
+                                    onClick={() => setSearchKeyword('')}
+                                    className="p-1 hover:bg-slate-800 rounded-full text-slate-500 transition-colors"
+                                >
+                                    <FiX />
+                                </button>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                <Stat
-                    title="Tổng đơn"
-                    info={stats.total}
+            {/* Stats Dashboard */}
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                <StatCard
+                    title="Tổng đơn hàng"
+                    value={stats.total}
+                    icon={<FiCreditCard />}
+                    color="text-slate-200"
+                    bg="from-slate-500/20 to-slate-600/5"
+                    borderColor="border-slate-500/20"
+                    active={activeFilter === 'all'}
                     onClick={() => handleClickStat("all")}
-                    className={activeFilter === 'all' ? 'border-blue-500/50 bg-blue-500/10' : ''}
                 />
-                <Stat
+                <StatCard
                     title="Chờ xử lý"
-                    info={stats.pending}
-                    className={`text-yellow-400 ${activeFilter === 'pending' ? 'border-yellow-500/50 bg-yellow-500/10' : ''}`}
+                    value={stats.pending}
+                    icon={<FiClock />}
+                    color="text-yellow-400"
+                    bg="from-yellow-500/20 to-yellow-600/5"
+                    borderColor="border-yellow-500/20"
+                    active={activeFilter === 'pending'}
                     onClick={() => handleClickStat("pending")}
                 />
-                <Stat
-                    title="Đang xử lý"
-                    info={stats.processing}
-                    className={`text-sky-400 ${activeFilter === 'processing' ? 'border-sky-500/50 bg-sky-500/10' : ''}`}
+                <StatCard
+                    title="Đang thực hiện"
+                    value={stats.processing}
+                    icon={<FiLoader />}
+                    color="text-sky-400"
+                    bg="from-sky-500/20 to-sky-600/5"
+                    borderColor="border-sky-500/20"
+                    active={activeFilter === 'processing'}
                     onClick={() => handleClickStat("processing")}
                 />
-                <Stat
+                <StatCard
                     title="Thành công"
-                    info={stats.success}
-                    className={`text-emerald-400 ${activeFilter === 'success' ? 'border-emerald-500/50 bg-emerald-500/10' : ''}`}
+                    value={stats.success}
+                    icon={<FiCheckCircle />}
+                    color="text-emerald-400"
+                    bg="from-emerald-500/20 to-emerald-600/5"
+                    borderColor="border-emerald-500/20"
+                    active={activeFilter === 'success'}
                     onClick={() => handleClickStat("success")}
                 />
-                <Stat
+                <StatCard
                     title="Đã hủy"
-                    info={stats.cancelled}
-                    className={`text-rose-400 ${activeFilter === 'cancelled' ? 'border-rose-500/50 bg-rose-500/10' : ''}`}
+                    value={stats.cancelled}
+                    icon={<FiXCircle />}
+                    color="text-rose-400"
+                    bg="from-rose-500/20 to-rose-600/5"
+                    borderColor="border-rose-500/20"
+                    active={activeFilter === 'cancelled'}
                     onClick={() => handleClickStat("cancelled")}
                 />
             </div>
 
-            {/* Order Filter Status Label */}
-            <div className="flex items-center gap-2 text-slate-400 text-sm font-medium pl-2">
-                <FiFilter className="text-cyan-400" />
-                Đang xem: <span className="text-white font-bold uppercase">{activeFilter === 'all' ? 'Tất cả' : activeFilter}</span>
+            {/* Content Divider */}
+            <div className="flex items-center gap-4 py-2">
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-700 to-transparent"></div>
+                <div className="px-4 py-1.5 rounded-full bg-slate-800/50 border border-slate-700 text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                    <FiFilter className="text-cyan-400" />
+                    Đang xem: <span className="text-white">{activeFilter === 'all' ? 'Tất cả' : activeFilter}</span>
+                </div>
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-700 to-transparent"></div>
             </div>
 
             {/* Order list */}

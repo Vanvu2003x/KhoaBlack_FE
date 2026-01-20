@@ -2,14 +2,21 @@ import { io } from "socket.io-client";
 
 let socket = null;
 
-export const connectSocket = (token, onBalanceUpdate) => {
-  // Token is ignored as we use cookies now
+const listeners = {
+  balance: new Set(),
+  order: new Set()
+};
+
+export const connectSocket = (token, onBalanceUpdate, onOrderUpdate) => {
   const URL = process.env.NEXT_PUBLIC_API_URL;
+
+  if (onBalanceUpdate) listeners.balance.add(onBalanceUpdate);
+  if (onOrderUpdate) listeners.order.add(onOrderUpdate);
 
   if (!socket) {
     socket = io(URL, {
       withCredentials: true,
-      transports: ['websocket', 'polling'], // Prefer websocket over polling
+      transports: ['websocket', 'polling'],
       reconnectionAttempts: 10,
       reconnectionDelay: 1000
     });
@@ -18,45 +25,33 @@ export const connectSocket = (token, onBalanceUpdate) => {
       console.log("✅ Socket connected:", socket.id);
     });
 
-    socket.on("error", (err) => {
-      console.error("❌ Socket error:", err);
-    });
-
-    socket.on("disconnect", () => {
-      console.log("🔌 Socket disconnected");
-    });
-  } else {
-    if (!socket.connected) {
-      socket.connect();
-    }
-    console.log("♻️ Reusing existing socket connection");
-  }
-
-  // Always update listeners to ensure the latest callback is used
-  if (onBalanceUpdate) {
-    // Clear previous listeners to avoid duplicates (stale closures)
-    socket.off("balance_update");
-    socket.off("authenticated");
-
     socket.on("authenticated", (user) => {
       console.log("✅ Xác thực socket thành công:", user);
       localStorage.setItem("balance", user.balance);
-      if (onBalanceUpdate) {
-        onBalanceUpdate(user.balance);
-      }
+      listeners.balance.forEach(cb => cb(user.balance));
     });
 
     socket.on("balance_update", (newBalance) => {
       console.log("💰 Balance cập nhật:", newBalance);
       localStorage.setItem("balance", newBalance);
-      localStorage.removeItem("tttt")
-      if (onBalanceUpdate) {
-        onBalanceUpdate(newBalance);
-      }
+      listeners.balance.forEach(cb => cb(newBalance));
     });
+
+    socket.on("order_update", (orderData) => {
+      console.log("📦 Order cập nhật:", orderData);
+      listeners.order.forEach(cb => cb(orderData));
+    });
+  } else if (!socket.connected) {
+    socket.connect();
   }
 
-  return socket;
+  return {
+    socket,
+    unsubscribe: () => {
+      if (onBalanceUpdate) listeners.balance.delete(onBalanceUpdate);
+      if (onOrderUpdate) listeners.order.delete(onOrderUpdate);
+    }
+  };
 };
 
 export const getSocket = () => socket;

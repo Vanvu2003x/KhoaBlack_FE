@@ -30,7 +30,7 @@ export async function searchPkg(id, keyword) {
 
 export async function updatePkg(id, formData) {
     const apiURL = `api/toup-package?id=${id}`;
-    const res = await api.patch(apiURL, formData, {
+    const res = await api.put(apiURL, formData, {
         headers: {
             "Content-Type": "multipart/form-data",
         },

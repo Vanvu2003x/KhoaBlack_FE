@@ -2,104 +2,163 @@
 import ReactMarkdown from "react-markdown"
 import { useState } from "react"
 import api from "@/utils/axios"
-import { FiTrash2, FiMaximize2, FiDollarSign, FiTag } from "react-icons/fi"
+import { FiTrash2, FiMaximize2, FiDollarSign, FiTag, FiEdit, FiClock, FiCheckCircle } from "react-icons/fi"
+import { useToast } from "@/components/ui/Toast"
 
-export default function AccItem({ acc, onDelete }) {
+export default function AccItem({ acc, onDelete, onEdit }) {
     const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL
+    const toast = useToast()
     const [status, setStatus] = useState(acc.status)
     const [showModal, setShowModal] = useState(false)
+    const [deleteLoading, setDeleteLoading] = useState(false)
 
     const handleDelete = async () => {
         if (!confirm("Bạn có chắc muốn xóa account này không?")) return
+        setDeleteLoading(true)
         try {
             const token = localStorage.getItem("token")
             await api.delete(`/api/acc/${acc.id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
+            toast.success("Xóa tài khoản thành công!")
             if (onDelete) onDelete(acc.id)
         } catch (error) {
             console.error("Lỗi khi xóa account:", error)
+            toast.error("Lỗi khi xóa tài khoản: " + (error.response?.data?.message || error.message))
+        } finally {
+            setDeleteLoading(false)
         }
     }
 
-    const statusClasses = {
-        selling: "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20",
-        sold: "bg-slate-700/50 text-slate-400 border border-slate-600/30"
-    }
+    const isSold = status === 'sold'
 
     return (
         <>
-            <div className="w-full bg-[#1E293B]/50 backdrop-blur-md border border-white/5 rounded-2xl p-4 transition-all hover:border-cyan-500/30 hover:bg-[#1E293B]/80 flex flex-col h-full shadow-lg">
-                {/* ID Header */}
-                <div className="flex justify-between items-center mb-3">
-                    <span className="text-xs font-mono text-slate-500 bg-[#0F172A] px-2 py-1 rounded-md">ID: {acc.id}</span>
-                    <div className={`px-2 py-0.5 text-xs font-bold rounded uppercase ${statusClasses[status] || 'text-slate-500'}`}>
-                        {status}
-                    </div>
-                </div>
-
-                {/* Image */}
-                {acc.image && (
-                    <div className="relative group mb-4 rounded-xl overflow-hidden border border-white/10 bg-[#0F172A] aspect-video">
+            <div className={`
+                group relative w-full h-full flex flex-col
+                bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden
+                hover:border-purple-500/30 hover:shadow-2xl hover:shadow-purple-500/10
+                transition-all duration-300 transform hover:-translate-y-1
+            `}>
+                {/* Image Section */}
+                <div className="relative aspect-[16/9] overflow-hidden bg-slate-950">
+                    {acc.image ? (
                         <img
                             src={`${apiBaseUrl}/uploads/${acc.image}`}
-                            alt="acc"
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                            onClick={() => setShowModal(true)}
+                            alt={`Acc #${acc.id}`}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
-                        <div
-                            className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
-                            onClick={() => setShowModal(true)}
-                        >
-                            <FiMaximize2 className="text-white drop-shadow-lg" size={24} />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center text-slate-700">
+                            <span className="text-4xl">🎮</span>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                {/* Content */}
-                <div className="flex-1 mb-4 relative">
-                    <div className="h-32 overflow-y-auto pr-2 custom-scrollbar text-sm text-slate-300 prose prose-invert max-w-none">
-                        <div dangerouslySetInnerHTML={{ __html: acc.info }} />
+                    {/* Status Badge */}
+                    <div className="absolute top-3 right-3 z-10">
+                        <span className={`
+                            px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-lg border
+                            ${isSold
+                                ? "bg-slate-900/80 text-slate-400 border-slate-700"
+                                : "bg-emerald-500/20 text-emerald-400 border-emerald-500/20"}
+                        `}>
+                            {isSold ? "Đã bán" : "Có sẵn"}
+                        </span>
                     </div>
-                    <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#1E293B] to-transparent pointer-events-none"></div>
+
+                    {/* ID Badge */}
+                    <div className="absolute top-3 left-3 z-10">
+                        <span className="bg-black/60 backdrop-blur-md text-white text-xs font-mono font-bold px-2 py-1 rounded-lg border border-white/10">
+                            #{acc.id}
+                        </span>
+                    </div>
+
+                    {/* Overlay Actions */}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-[2px]">
+                        <button
+                            onClick={() => setShowModal(true)}
+                            className="p-3 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all transform hover:scale-110"
+                            title="Xem ảnh lớn"
+                        >
+                            <FiMaximize2 size={20} />
+                        </button>
+                    </div>
                 </div>
 
-                {/* Footer */}
-                <div className="pt-4 mt-auto border-t border-white/5 flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-emerald-400 font-bold font-mono text-lg">
-                        <FiDollarSign size={16} /> {Number(acc.price).toLocaleString('vi-VN')}
+                {/* Content Section */}
+                <div className="flex-1 p-5 flex flex-col">
+                    {/* Price and Metadata */}
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                            <div className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
+                                {Number(acc.price).toLocaleString('vi-VN')}
+                                <span className="text-sm text-slate-500 font-medium ml-1">₫</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <button
-                        type="button"
-                        onClick={handleDelete}
-                        className="bg-rose-500/10 text-rose-500 border border-rose-500/20 px-3 py-1.5 rounded-lg hover:bg-rose-500/20 text-sm font-bold flex items-center gap-2 transition-colors"
-                    >
-                        <FiTrash2 size={14} /> Xóa
-                    </button>
+                    <div className="w-full h-px bg-slate-800 mb-4"></div>
+
+                    {/* Info Text */}
+                    <div className="flex-1 relative mb-4">
+                        <div className="text-sm text-slate-300 leading-relaxed font-medium line-clamp-3">
+                            <div dangerouslySetInnerHTML={{ __html: acc.info }} />
+                        </div>
+                    </div>
+
+                    {/* Footer Actions */}
+                    <div className="mt-auto grid grid-cols-2 gap-3 opacity-80 group-hover:opacity-100 transition-opacity">
+                        <button
+                            type="button"
+                            onClick={() => onEdit && onEdit(acc)}
+                            className="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white py-2.5 rounded-xl text-sm font-bold transition-all border border-slate-700 hover:border-slate-600"
+                        >
+                            <FiEdit /> Edit
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleDelete}
+                            disabled={deleteLoading}
+                            className="flex items-center justify-center gap-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 py-2.5 rounded-xl text-sm font-bold transition-all border border-rose-500/10 hover:border-rose-500/30"
+                        >
+                            {deleteLoading ? (
+                                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                </svg>
+                            ) : (
+                                <FiTrash2 />
+                            )}
+                            Delete
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            {/* Modal */}
+            {/* Modal Image Zoom */}
             {showModal && (
                 <div
-                    className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-[fadeIn_0.2s_ease-out]"
+                    className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-[100] p-4 animate-[fadeIn_0.2s_ease-out]"
                     onClick={() => setShowModal(false)}
                 >
                     <img
                         src={`${apiBaseUrl}/uploads/${acc.image}`}
                         alt="acc full"
-                        className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl animate-[scaleIn_0.2s_ease-out]"
+                        className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl animate-[scaleIn_0.3s_cubic-bezier(0.16,1,0.3,1)]"
                         onClick={(e) => e.stopPropagation()}
                     />
                     <button
-                        className="absolute top-4 right-4 text-white/50 hover:text-white"
+                        className="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white/70 hover:text-white transition-all backdrop-blur-md"
                         onClick={() => setShowModal(false)}
                     >
-                        ✕ Close
+                        <FiX className="w-6 h-6" />
                     </button>
                 </div>
             )}
         </>
     )
+}
+
+function FiX({ className }) {
+    return <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" className={className} height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
 }

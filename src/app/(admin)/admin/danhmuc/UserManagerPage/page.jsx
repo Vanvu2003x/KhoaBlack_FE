@@ -1,6 +1,6 @@
 "use client";
 import { sendAdminOTP, verifyAdminOTP } from "@/services/auth.service";
-import { changeBalance, changeRole, getAllUserByKeyword, toggleUserLock } from "@/services/user.service";
+import { changeBalance, changeRole, getAllUserByKeyword, toggleUserLock, updateUserLevel } from "@/services/user.service";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/Toast";
 import { FiUsers, FiSearch, FiShield, FiMoreVertical, FiCreditCard, FiLock, FiUnlock, FiMail, FiCalendar, FiDollarSign } from 'react-icons/fi';
@@ -225,6 +225,26 @@ export default function UserList() {
         }
     }
 
+    async function handleUpdateLevel(id, newLevel) {
+        const user = users.find((u) => u.id === id);
+        if (!user) return;
+        try {
+            const res = await updateUserLevel(id, newLevel);
+            if (res.success) {
+                toast.success(res.message);
+                setUsers((prevUsers) =>
+                    prevUsers.map((u) =>
+                        u.id === id ? { ...u, level: Number(newLevel) } : u
+                    )
+                );
+            } else {
+                toast.error(res.message || "Cập nhật level thất hạn");
+            }
+        } catch (error) {
+            toast.error("Lỗi khi cập nhật level");
+        }
+    }
+
 
     if (loading) return (
         <div className="flex justify-center items-center py-20">
@@ -306,6 +326,12 @@ export default function UserList() {
                                                 'bg-slate-700/30 text-slate-400 border-slate-600/30'
                                             }`}>
                                             {user.role}
+                                        </span>
+                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${user.level === 2 ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
+                                            user.level === 3 ? 'bg-red-500/10 text-red-500 border-red-500/20' :
+                                                'bg-cyan-500/10 text-cyan-500 border-cyan-500/20'
+                                            }`}>
+                                            {user.level === 2 ? "Pro" : user.level === 3 ? "Plus/VIP" : "Basic"}
                                         </span>
                                     </h3>
                                     <div className="text-slate-400 text-sm flex items-center gap-2 mt-1">
@@ -392,6 +418,24 @@ export default function UserList() {
                                             <span className="text-blue-400">Mua: {user.so_don_order || 0}</span>
                                             <span className="text-purple-400">Nạp: {user.so_don_da_nap || 0}</span>
                                         </div>
+                                    </div>
+                                </div>
+
+                                <div className="mb-4 bg-[#0F172A] p-3 rounded-xl border border-white/5 flex items-center justify-between">
+                                    <span className="text-slate-500 text-sm font-bold">Cấp độ (Level)</span>
+                                    <div className="flex gap-2">
+                                        {[1, 2, 3].map((lvl) => (
+                                            <button
+                                                key={lvl}
+                                                onClick={() => handleUpdateLevel(user.id, lvl)}
+                                                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all border ${user.level === lvl
+                                                    ? "bg-cyan-600 text-white border-cyan-500"
+                                                    : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700"
+                                                    }`}
+                                            >
+                                                {lvl === 1 ? "Basic" : lvl === 2 ? "Pro" : "VIP"}
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
 

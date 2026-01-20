@@ -23,6 +23,21 @@ export default function AccSellingLog() {
 
     useEffect(() => {
         fetchOrders();
+
+        // Listen for real-time order updates
+        const { connectSocket } = require("../../../../services/websocket.sever");
+        const { unsubscribe } = connectSocket(
+            null,
+            null,
+            (orderData) => {
+                console.log("Real-time order update received in AccSellingLog:", orderData);
+                fetchOrders();
+            }
+        );
+
+        return () => {
+            unsubscribe();
+        };
     }, []);
 
     const totalPage = Math.ceil(orders.length / itemsPerPage);
@@ -124,6 +139,12 @@ export default function AccSellingLog() {
                                                     <span className="text-slate-200">{order.user_email}</span>
                                                 </div>
                                                 <div className="flex justify-between items-center py-2 border-b border-white/5">
+                                                    <span className="text-slate-400">Email nhận:</span>
+                                                    <span className="text-teal-400 font-medium">
+                                                        {order.contact_info?.email || order.user_email || "..."}
+                                                    </span>
+                                                </div>
+                                                <div className="flex justify-between items-center py-2 border-b border-white/5">
                                                     <span className="text-slate-400">Ngày mua:</span>
                                                     <span className="text-slate-200">
                                                         {order.created_at ? new Date(order.created_at).toLocaleString("vi-VN") : ".."}
@@ -138,6 +159,27 @@ export default function AccSellingLog() {
                                                             <span className="text-slate-600 italic text-xs">Chưa cập nhật</span>
                                                         )}
                                                     </span>
+                                                </div>
+                                            </div>
+
+                                            {/* Account Credentials */}
+                                            <div className="space-y-3 bg-emerald-500/10 p-4 rounded-xl border border-emerald-500/20">
+                                                <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-2">🎉 Thông tin đăng nhập</h4>
+                                                <div className="grid grid-cols-1 gap-2 text-slate-300">
+                                                    <div className="flex justify-between border-b border-white/5 pb-2">
+                                                        <span className="text-slate-500">Tài khoản:</span>
+                                                        <span className="font-mono font-bold text-white select-all">{order.acc_username || "..."}</span>
+                                                    </div>
+                                                    <div className="flex justify-between border-b border-white/5 pb-2">
+                                                        <span className="text-slate-500">Mật khẩu:</span>
+                                                        <span className="font-mono font-bold text-white select-all">{order.acc_password || "..."}</span>
+                                                    </div>
+                                                    <div className="flex flex-col gap-1 pt-1">
+                                                        <span className="text-slate-500">Thông tin thêm:</span>
+                                                        <div className="text-sm bg-black/20 p-2 rounded text-slate-200 whitespace-pre-wrap">
+                                                            {order.acc_info || "Không có thông tin thêm"}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
 

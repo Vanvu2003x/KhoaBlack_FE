@@ -48,6 +48,9 @@ export default function TopUpPackageManagerPage() {
         package_name: "",
         price: "",
         origin_price: "",
+        price_basic: "",
+        price_pro: "",
+        price_plus: "",
         package_type: "default",
         status: "active",
         id_server: false,
@@ -152,6 +155,9 @@ export default function TopUpPackageManagerPage() {
             package_name: "",
             price: "",
             origin_price: "",
+            price_basic: "",
+            price_pro: "",
+            price_plus: "",
             package_type: "default",
             status: "active",
             id_server: false,
@@ -174,6 +180,9 @@ export default function TopUpPackageManagerPage() {
             package_name: pkg.package_name,
             price: pkg.price,
             origin_price: pkg.origin_price || "",
+            price_basic: pkg.price_basic || "",
+            price_pro: pkg.price_pro || "",
+            price_plus: pkg.price_plus || "",
             package_type: pkg.package_type || "default",
             status: pkg.status || "active",
             id_server: pkg.id_server ? true : false,
@@ -229,6 +238,9 @@ export default function TopUpPackageManagerPage() {
             data.append("game_id", selectedGame.id); // Important
             data.append("price", formData.price);
             data.append("origin_price", formData.origin_price || 0);
+            data.append("price_basic", formData.price_basic || 0);
+            data.append("price_pro", formData.price_pro || 0);
+            data.append("price_plus", formData.price_plus || 0);
             data.append("package_type", formData.package_type);
             data.append("status", formData.status);
             data.append("id_server", formData.id_server ? 1 : 0); // Boolean to int often safer for FormData
@@ -534,7 +546,7 @@ export default function TopUpPackageManagerPage() {
                             {/* Pricing Row */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-400 mb-2">Giá Bán (VND)</label>
+                                    <label className="block text-sm font-medium text-slate-400 mb-2">Giá Bán (Mặc định/Basic)</label>
                                     <div className="relative">
                                         <FiDollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
                                         <input
@@ -549,7 +561,7 @@ export default function TopUpPackageManagerPage() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-400 mb-2">Giá Gốc (VND) - Tùy chọn</label>
+                                    <label className="block text-sm font-medium text-slate-400 mb-2">Giá Gốc (Giá nhập)</label>
                                     <div className="relative">
                                         <FiDollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
                                         <input
@@ -558,6 +570,38 @@ export default function TopUpPackageManagerPage() {
                                             onChange={(e) => setFormData({ ...formData, origin_price: e.target.value })}
                                             className="w-full bg-[#0F172A] border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-slate-200 focus:outline-none focus:border-blue-500 transition-colors font-mono"
                                             placeholder="150000"
+                                            min="0"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Level Pricing Row */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-400 mb-2">Giá Pro/Pre (VND)</label>
+                                    <div className="relative">
+                                        <FiDollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                                        <input
+                                            type="number"
+                                            value={formData.price_pro}
+                                            onChange={(e) => setFormData({ ...formData, price_pro: e.target.value })}
+                                            className="w-full bg-[#0F172A] border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-slate-200 focus:outline-none focus:border-blue-500 transition-colors font-mono"
+                                            placeholder="Tự động"
+                                            min="0"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-400 mb-2">Giá VIP/Plus (VND)</label>
+                                    <div className="relative">
+                                        <FiDollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                                        <input
+                                            type="number"
+                                            value={formData.price_plus}
+                                            onChange={(e) => setFormData({ ...formData, price_plus: e.target.value })}
+                                            className="w-full bg-[#0F172A] border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-slate-200 focus:outline-none focus:border-blue-500 transition-colors font-mono"
+                                            placeholder="Tự động"
                                             min="0"
                                         />
                                     </div>
