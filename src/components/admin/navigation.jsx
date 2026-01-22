@@ -125,7 +125,7 @@ export default function Nav() {
 
                     <div className={`space-y-1 pl-2 overflow-hidden transition-all duration-300 ${openMenus['orders'] ? "max-h-96 opacity-100 mt-2" : "max-h-0 opacity-0"}`}>
                         <SubItem href="/admin/danhmuc/WalletManagerPage" icon={FiCreditCard} label="Lịch sử Nạp ví" />
-                        <SubItem href="/admin/danhmuc/ToUpManagerPage" icon={FiClipboard} label="Đơn Nạp game" />
+                        <SubItem href="/admin/danhmuc/ToUpManagerPage" icon={FiClipboard} label="Quản lý Đơn hàng" />
                         <SubItem href="/admin/danhmuc/AccSellingPage" icon={FiUser} label="Đơn Bán acc" />
                     </div>
                 </div>

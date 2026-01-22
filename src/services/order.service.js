@@ -29,8 +29,8 @@ export const getOrderStatistics = async () => {
 //Hàm thay đổi status
 
 export const changeStatus = async (id, newStatus) => {
-  const res = await api.patch(
-    `/api/order/${id}/status`,
+  const res = await api.post(
+    `/api/order/change-status/${id}`,
     {
       status: newStatus,
     }
@@ -54,9 +54,9 @@ export const createOrder = async (data) => {
   return res.data;
 };
 export const CancelOrder = async (id) => {
+  // User self-cancel
   const apiurl = `/api/order/${id}/cancel`;
-
-  const res = await api.patch(apiurl, {});
+  const res = await api.put(apiurl, {});
 
   return res.data;
 };
@@ -91,14 +91,13 @@ export const getOrdersByUserNap = async (status) => {
 // Nhận đơn (chuyển trạng thái -> processing)
 export const acceptOrder = async (id) => {
   const apiurl = `/api/order/${id}/accept`;
-
-  const res = await api.patch(apiurl, {});
+  const res = await api.post(apiurl, {});
 
   return res.data;
 };
 // Hoàn thành đơn (status = success)
 export const completeOrder = async (id) => {
-  const res = await api.patch(
+  const res = await api.post(
     `/api/order/${id}/complete`,
     {}
   );
@@ -107,8 +106,9 @@ export const completeOrder = async (id) => {
 
 // Hủy đơn + hoàn tiền (status = cancel)
 export const cancelOrder1 = async (id) => {
-  const res = await api.patch(
-    `/api/order/${id}/cancel`,
+  // Admin Cancel & Refund
+  const res = await api.post(
+    `/api/order/cancel-refund/${id}`,
     {}
   );
   return res.data;
