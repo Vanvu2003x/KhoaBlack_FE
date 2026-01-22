@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getInfo } from "@/services/auth.service";
 import { getFinancialSummary } from "@/services/user.service";
+import { connectSocket } from "@/services/websocket.sever";
 import PaymentWallet from "./components/PaymentWallet";
 import AccountSidebar from "./components/AccountSidebar";
 import UserProfileCard from "./components/UserProfileCard";
@@ -45,7 +46,12 @@ export default function AccountPage() {
                 if (data?.user) {
                     setUser(data.user);
 
-                    // 2. Only fetch summary if user exists
+                    // 2. Subscribe to socket for real-time balance updates
+                    connectSocket(null, (newBalance) => {
+                        setUser(prev => prev ? { ...prev, balance: newBalance } : prev);
+                    });
+
+                    // 3. Only fetch summary if user exists
                     try {
                         const res = await getFinancialSummary();
                         if (res && res.data) {
@@ -64,6 +70,7 @@ export default function AccountPage() {
 
         fetchAllData();
     }, []);
+
 
     // Hiển thị nội dung dựa trên tab active
     const renderContent = () => {

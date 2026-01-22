@@ -35,9 +35,8 @@ export default function RegisterForm({ onClose, onSwitch }) {
         try {
             const userData = await Register(username, email, password, OTP);
             // Backend now automatically logs in and sets cookie
-            // No need to manually call Login or store token
+            // Balance will be updated via socket connection, no need to store in localStorage
             localStorage.setItem("name", userData.name_user);
-            localStorage.setItem("balance", userData.balance || 0);
             toast.success("Đăng ký thành công!");
             window.location.reload();
         } catch (error) {

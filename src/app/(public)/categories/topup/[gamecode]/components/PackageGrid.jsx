@@ -191,7 +191,7 @@ export default function PackageGrid({
                                                     : "text-cyan-400/80"
                                                     }`}
                                             >
-                                                VN\u0110
+                                                VNĐ
                                             </div>
                                         </div>
                                     </div>

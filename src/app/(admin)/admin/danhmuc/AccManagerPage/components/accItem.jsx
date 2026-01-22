@@ -4,6 +4,7 @@ import { useState } from "react"
 import api from "@/utils/axios"
 import { FiTrash2, FiMaximize2, FiDollarSign, FiTag, FiEdit, FiClock, FiCheckCircle } from "react-icons/fi"
 import { useToast } from "@/components/ui/Toast"
+import DOMPurify from "dompurify"
 
 export default function AccItem({ acc, onDelete, onEdit }) {
     const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL
@@ -102,7 +103,7 @@ export default function AccItem({ acc, onDelete, onEdit }) {
                     {/* Info Text */}
                     <div className="flex-1 relative mb-4">
                         <div className="text-sm text-slate-300 leading-relaxed font-medium line-clamp-3">
-                            <div dangerouslySetInnerHTML={{ __html: acc.info }} />
+                            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(acc.info || '') }} />
                         </div>
                     </div>
 

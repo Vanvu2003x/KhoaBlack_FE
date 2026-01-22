@@ -101,6 +101,8 @@ const AccOrderCard = ({ order, onSendAcc, onCancel, onViewImage }) => {
                                     <span className="flex items-center gap-1"><FiPhone className="text-slate-500" /> {order.contact_info?.phone || "N/A"}</span>
                                     <span className="w-px h-4 bg-slate-700"></span>
                                     <span className="flex items-center gap-1"><FiMessageSquare className="text-slate-500" /> {order.contact_info?.zalo || "N/A"}</span>
+                                    <span className="w-px h-4 bg-slate-700"></span>
+                                    <span className="flex items-center gap-1"><FiMail className="text-slate-500" /> {order.contact_info?.email || "N/A"}</span>
                                 </div>
                             </div>
                             <div className="text-right">

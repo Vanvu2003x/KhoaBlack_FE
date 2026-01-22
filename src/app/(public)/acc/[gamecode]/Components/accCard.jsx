@@ -1,9 +1,10 @@
 "use client"
 import { BuyAcc } from "@/services/accOrder"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useToast } from "@/components/ui/Toast"
 import { FiZap, FiShoppingCart, FiX, FiMaximize2, FiPhone, FiMail, FiMessageSquare } from "react-icons/fi"
 import Link from "next/link"
+import DOMPurify from "dompurify"
 
 export default function AccCardItem({ acc, userLevel, onBuySuccess }) {
     const toast = useToast()
@@ -14,11 +15,12 @@ export default function AccCardItem({ acc, userLevel, onBuySuccess }) {
 
     // Calculate Price Logic
     const getFinalPrice = () => {
+        const level = Number(userLevel) || 1;
         let final = acc.price;
-        if (userLevel === 2 && acc.price_pro) final = acc.price_pro;
-        if (userLevel === 3 && acc.price_plus) final = acc.price_plus;
+        if (level === 2 && acc.price_pro) final = acc.price_pro;
+        if (level === 3 && acc.price_plus) final = acc.price_plus;
         // Basic override if exists (rare)
-        if (userLevel === 1 && acc.price_basic) final = acc.price_basic;
+        if (level === 1 && acc.price_basic) final = acc.price_basic;
         return parseInt(final);
     }
 
@@ -132,7 +134,7 @@ export default function AccCardItem({ acc, userLevel, onBuySuccess }) {
                     {/* Description */}
                     <div className="flex-1 relative mb-4 min-h-[4.5em]">
                         <div className="text-sm text-slate-300 font-medium leading-relaxed line-clamp-3">
-                            <div dangerouslySetInnerHTML={{ __html: acc.info }} />
+                            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(acc.info || '') }} />
                         </div>
                     </div>
 

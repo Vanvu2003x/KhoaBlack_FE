@@ -98,12 +98,12 @@ export default function TopUpClient({ game, listPkg: initialListPkg }) {
 
         // Validation logic
         if (rechargeMethod === "uid") {
-            if (game?.sever?.length > 1 && !server) {
+            if (game?.server?.length > 1 && !server) {
                 toast.warn("Vui lòng chọn Server.");
                 return;
             }
             if (
-                game?.sever?.length === 0 &&
+                game?.server?.length === 0 &&
                 selectedPkg.id_server &&
                 !idServer
             ) {

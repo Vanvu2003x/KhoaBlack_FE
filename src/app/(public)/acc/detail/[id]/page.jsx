@@ -5,6 +5,7 @@ import { FiArrowLeft, FiHeart, FiShoppingCart, FiZap, FiCheck, FiStar, FiTrendin
 import { BuyAcc } from "@/services/accOrder"
 import { toast } from "react-toastify"
 import ReactMarkdown from "react-markdown"
+import { getInfo } from "@/services/auth.service"
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL
 
@@ -18,6 +19,7 @@ export default function AccDetailPage() {
     const [selectedImage, setSelectedImage] = useState(0)
     const [showBuyModal, setShowBuyModal] = useState(false)
     const [buying, setBuying] = useState(false)
+    const [userLevel, setUserLevel] = useState(1)
 
     const [contactInfo, setContactInfo] = useState({
         phone: "",
@@ -25,6 +27,21 @@ export default function AccDetailPage() {
         zalo: "",
         note: ""
     })
+
+    // Fetch User Info
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const data = await getInfo()
+                if (data && data.user) {
+                    setUserLevel(Number(data.user.level) || 1)
+                }
+            } catch (err) {
+                console.error("Fetch user error:", err)
+            }
+        }
+        fetchUser()
+    }, [])
 
     useEffect(() => {
         if (!accId) return
@@ -87,6 +104,15 @@ export default function AccDetailPage() {
             </div>
         )
     }
+
+    // Pricing Logic
+    const basePrice = Number(acc.price);
+    let finalPrice = basePrice;
+
+    // Logic must match Backend `accOrder.service.js`
+    if (userLevel === 2 && acc.price_pro) finalPrice = Number(acc.price_pro);
+    if (userLevel === 3 && acc.price_plus) finalPrice = Number(acc.price_plus);
+    if (userLevel === 1 && acc.price_basic) finalPrice = Number(acc.price_basic);
 
     // Parse images array or fallback to single image
     const images = acc.images ? JSON.parse(acc.images) : (acc.image ? [acc.image] : [])
@@ -221,11 +247,18 @@ export default function AccDetailPage() {
 
                             <div className="border-t border-white/10 pt-4 mb-6">
                                 <div className="text-slate-400 text-sm mb-2">GIÁ BÁN</div>
-                                <div className="flex items-end gap-2">
-                                    <span className="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-                                        {parseInt(acc.price).toLocaleString('vi-VN')}
-                                    </span>
-                                    <span className="text-emerald-400 text-xl mb-1">₫</span>
+                                <div className="flex flex-col items-start">
+                                    {finalPrice < basePrice && (
+                                        <span className="text-slate-500 text-sm line-through decoration-slate-500 mb-1">
+                                            {basePrice.toLocaleString('vi-VN')} ₫
+                                        </span>
+                                    )}
+                                    <div className="flex items-end gap-2">
+                                        <span className="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                                            {finalPrice.toLocaleString('vi-VN')}
+                                        </span>
+                                        <span className="text-emerald-400 text-xl mb-1">₫</span>
+                                    </div>
                                 </div>
                                 <div className="text-slate-500 text-sm mt-1">VÀO TAY GIÁ TOANG</div>
                             </div>

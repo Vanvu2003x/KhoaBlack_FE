@@ -29,7 +29,7 @@ export async function searchPkg(id, keyword) {
 }
 
 export async function updatePkg(id, formData) {
-    const apiURL = `api/toup-package?id=${id}`;
+    const apiURL = `/api/toup-package?id=${id}`;
     const res = await api.put(apiURL, formData, {
         headers: {
             "Content-Type": "multipart/form-data",
@@ -38,7 +38,7 @@ export async function updatePkg(id, formData) {
     return res.data;
 }
 export async function changeStatus(id, newStatus) {
-    const apiURL = `api/toup-package/status?id=${id}`;
+    const apiURL = `/api/toup-package/status?id=${id}`;
     const res = await api.patch(apiURL, { newStatus }, {
         headers: {
             "Content-Type": "application/json",
