@@ -1,6 +1,9 @@
+export const dynamic = 'force-dynamic';
+
 export default async function sitemap() {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://khoablacktopup.vn";
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    // Ưu tiên sử dụng API_URL (internal) nếu có để tránh lỗi loopback trên VPS
+    const apiUrl = process.env.INTERNAL_API_URL || process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
 
     // Static pages
     const staticPages = [

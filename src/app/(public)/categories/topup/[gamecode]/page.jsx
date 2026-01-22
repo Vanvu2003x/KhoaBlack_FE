@@ -5,6 +5,7 @@ import TopUpClient from "./components/TopUpClient";
 export async function generateMetadata(props) {
     const params = await props.params;
     const gamecode = params.gamecode;
+    const apiUrl = process.env.INTERNAL_API_URL || process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
     try {
         const game = await getGameByGameCode(gamecode);
         if (game) {

@@ -34,8 +34,8 @@ const getSocketUrl = () => {
     return origin;
   }
 
-  // Fallback for SSR
-  return 'http://localhost:5000';
+  // Fallback for SSR or when no env vars are present
+  return undefined;
 };
 
 export const connectSocket = (token, onBalanceUpdate, onOrderUpdate) => {

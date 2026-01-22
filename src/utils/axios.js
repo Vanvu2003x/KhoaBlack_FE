@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: (typeof window === 'undefined' ? (process.env.INTERNAL_API_URL || process.env.API_URL) : undefined) || process.env.NEXT_PUBLIC_API_URL,
   withCredentials: true,
   timeout: 30000 // 30 seconds timeout
 });
