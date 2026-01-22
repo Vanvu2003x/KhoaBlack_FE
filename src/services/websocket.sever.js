@@ -67,6 +67,11 @@ export const connectSocket = (token, onBalanceUpdate, onOrderUpdate) => {
         console.log("   Socket ID:", socket.id);
         console.log("   Transport:", socket.io.engine.transport.name);
       }
+      // Authenticate with token if provided
+      if (token) {
+        console.log("🔐 Authenticating socket with token...");
+        socket.emit("auth", token);
+      }
     });
 
     socket.on("connect_error", (error) => {

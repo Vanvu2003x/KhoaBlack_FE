@@ -37,7 +37,8 @@ export default function Header() {
                         setBalance(user.balance || 0);
                         localStorage.setItem("name", user.name);
 
-                        connectSocket(null, (newBalance) => {
+                        const token = localStorage.getItem("token");
+                        connectSocket(token, (newBalance) => {
                             setBalance(newBalance);
                         });
                     }
