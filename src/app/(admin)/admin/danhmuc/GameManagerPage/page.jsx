@@ -18,14 +18,17 @@ import {
     FiMoreVertical,
     FiGlobe,
     FiHash,
-    FiServer
+    FiServer,
+    FiRefreshCw
 } from "react-icons/fi";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import api from "@/utils/axios"; // Import api instance
 
 export default function GameManagerPage() {
     const [games, setGames] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [syncLoading, setSyncLoading] = useState(false); // Valid state
     const [searchTerm, setSearchTerm] = useState("");
 
     // Modal State
@@ -38,6 +41,9 @@ export default function GameManagerPage() {
         gamecode: "",
         publisher: "",
         server: [], // Array of server names
+        profit_percent_basic: 0,
+        profit_percent_pro: 0,
+        profit_percent_plus: 0
     });
     const [thumbnailFile, setThumbnailFile] = useState(null);
     const [previewImg, setPreviewImg] = useState(null);
@@ -55,6 +61,20 @@ export default function GameManagerPage() {
         }
     };
 
+    const handleSyncNapGame = async () => {
+        try {
+            setSyncLoading(true);
+            await api.post('/api/tools/sync-napgame');
+            toast.success("Đã đồng bộ dữ liệu từ NapGame247");
+            fetchGames(); // Refresh list to see new items
+        } catch (error) {
+            console.error(error);
+            toast.error("Lỗi khi đồng bộ dữ liệu");
+        } finally {
+            setSyncLoading(false);
+        }
+    };
+
     useEffect(() => {
         fetchGames();
     }, []);
@@ -65,6 +85,9 @@ export default function GameManagerPage() {
             gamecode: "",
             publisher: "",
             server: [],
+            profit_percent_basic: 0,
+            profit_percent_pro: 0,
+            profit_percent_plus: 0
         });
         setThumbnailFile(null);
         setPreviewImg(null);
@@ -83,6 +106,9 @@ export default function GameManagerPage() {
             gamecode: game.gamecode,
             publisher: game.publisher || "",
             server: Array.isArray(game.server) ? game.server : [],
+            profit_percent_basic: game.profit_percent_basic || 0,
+            profit_percent_pro: game.profit_percent_pro || 0,
+            profit_percent_plus: game.profit_percent_plus || 0,
         });
         setPreviewImg(process.env.NEXT_PUBLIC_API_URL + game.thumbnail);
         setThumbnailFile(null);
@@ -112,7 +138,16 @@ export default function GameManagerPage() {
 
         try {
             const data = new FormData();
-            data.append("info", JSON.stringify(formData));
+
+            // Construct info object including profit fields
+            const infoObj = {
+                ...formData,
+                profit_percent_basic: Number(formData.profit_percent_basic),
+                profit_percent_pro: Number(formData.profit_percent_pro),
+                profit_percent_plus: Number(formData.profit_percent_plus)
+            };
+
+            data.append("info", JSON.stringify(infoObj));
             if (thumbnailFile) {
                 data.append("thumbnail", thumbnailFile);
             }
@@ -120,6 +155,11 @@ export default function GameManagerPage() {
             if (currentGame) {
                 // Edit
                 await updateGame(currentGame.id, data);
+                if (currentGame.profit_percent_basic !== infoObj.profit_percent_basic ||
+                    currentGame.profit_percent_pro !== infoObj.profit_percent_pro ||
+                    currentGame.profit_percent_plus !== infoObj.profit_percent_plus) {
+                    toast.info("Đang cập nhật giá các gói nạp...");
+                }
                 toast.success("Cập nhật game thành công");
             } else {
                 // Add
@@ -192,6 +232,14 @@ export default function GameManagerPage() {
                             className="bg-[#0F172A] border border-white/10 text-slate-200 pl-10 pr-4 py-2.5 rounded-xl focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/50 w-full md:w-64 transition-all"
                         />
                     </div>
+                    <button
+                        onClick={handleSyncNapGame}
+                        disabled={syncLoading}
+                        className="flex items-center gap-2 bg-slate-800 text-teal-400 border border-teal-500/30 px-5 py-2.5 rounded-xl font-bold hover:bg-teal-500/10 hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+                    >
+                        <FiRefreshCw size={20} className={syncLoading ? "animate-spin" : ""} />
+                        <span className="hidden md:inline">{syncLoading ? "Đang đồng bộ..." : "Sync NapGame247"}</span>
+                    </button>
                     <button
                         onClick={handleOpenAdd}
                         className="flex items-center gap-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-teal-500/20 hover:shadow-teal-500/30 hover:scale-105 active:scale-95 transition-all"
@@ -275,13 +323,13 @@ export default function GameManagerPage() {
 
             {/* Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div className="fixed inset-0  flex items-center justify-center p-4">
                     <div
                         className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
                         onClick={handleCloseModal}
                     ></div>
-                    <div className="relative bg-[#1E293B] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl animate-[scaleIn_0.2s_ease-out] overflow-hidden">
-                        <div className="px-6 py-4 border-b border-white/10 flex justify-between items-center bg-slate-900/50">
+                    <div className="relative bg-[#1E293B] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl animate-[scaleIn_0.2s_ease-out] overflow-hidden flex flex-col max-h-[60vh] translate-y-5">
+                        <div className="px-6 py-4 border-b border-white/10 flex justify-between items-center bg-slate-900/50 shrink-0">
                             <h3 className="text-xl font-bold text-white">
                                 {currentGame ? "Chỉnh sửa Game" : "Thêm Game Mới"}
                             </h3>
@@ -290,51 +338,92 @@ export default function GameManagerPage() {
                             </button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="p-6 space-y-5">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-400 mb-2">Tên Game</label>
-                                <input
-                                    type="text"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full bg-[#0F172A] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-teal-500 transition-colors"
-                                    placeholder="Ví dụ: Liên Quân Mobile"
-                                />
-                            </div>
+                        <form onSubmit={handleSubmit} className="p-4 space-y-4 overflow-y-auto flex-1 h-[60vh]">
 
-                            <div className="grid grid-cols-2 gap-4">
+                            {/* General Info Grid */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="col-span-1 sm:col-span-2">
+                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Tên Game</label>
+                                    <input
+                                        type="text"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        className="w-full bg-[#0F172A] border border-slate-700 rounded-lg px-3 py-2 text-slate-200 text-sm focus:outline-none focus:border-teal-500 transition-colors"
+                                        placeholder="Ví dụ: Liên Quân Mobile"
+                                    />
+                                </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-400 mb-2">Mã Game (Code)</label>
+                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Mã Game (Code)</label>
                                     <input
                                         type="text"
                                         value={formData.gamecode}
                                         onChange={(e) => setFormData({ ...formData, gamecode: e.target.value })}
-                                        className="w-full bg-[#0F172A] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-teal-500 transition-colors font-mono"
+                                        className="w-full bg-[#0F172A] border border-slate-700 rounded-lg px-3 py-2 text-slate-200 text-sm focus:outline-none focus:border-teal-500 transition-colors font-mono"
                                         placeholder="lienquan"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-400 mb-2">Nhà Phát Hành (Publisher)</label>
+                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Nhà Phát Hành</label>
                                     <input
                                         type="text"
                                         value={formData.publisher}
                                         onChange={(e) => setFormData({ ...formData, publisher: e.target.value })}
-                                        className="w-full bg-[#0F172A] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-teal-500 transition-colors"
+                                        className="w-full bg-[#0F172A] border border-slate-700 rounded-lg px-3 py-2 text-slate-200 text-sm focus:outline-none focus:border-teal-500 transition-colors"
                                         placeholder="Ví dụ: Garena"
                                     />
                                 </div>
                             </div>
 
+                            {/* Profit Configuration */}
+                            <div className="bg-slate-800/50 p-3 rounded-lg border border-white/5 space-y-2">
+                                <label className="block text-xs font-bold text-slate-500 uppercase">Lợi Nhuận Tự Động (%)</label>
+                                <div className="grid grid-cols-3 gap-3">
+                                    <div>
+                                        <label className="block text-[10px] uppercase text-blue-400 mb-1">Basic</label>
+                                        <input
+                                            type="number"
+                                            value={formData.profit_percent_basic}
+                                            onChange={(e) => setFormData({ ...formData, profit_percent_basic: e.target.value })}
+                                            className="w-full bg-[#0F172A] border border-slate-700 rounded-lg px-2 py-1.5 text-slate-200 text-sm focus:outline-none focus:border-blue-500 transition-colors text-center font-bold"
+                                            placeholder="0"
+                                            min="0"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] uppercase text-purple-400 mb-1">Pro</label>
+                                        <input
+                                            type="number"
+                                            value={formData.profit_percent_pro}
+                                            onChange={(e) => setFormData({ ...formData, profit_percent_pro: e.target.value })}
+                                            className="w-full bg-[#0F172A] border border-slate-700 rounded-lg px-2 py-1.5 text-slate-200 text-sm focus:outline-none focus:border-purple-500 transition-colors text-center font-bold"
+                                            placeholder="0"
+                                            min="0"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] uppercase text-amber-400 mb-1">Plus</label>
+                                        <input
+                                            type="number"
+                                            value={formData.profit_percent_plus}
+                                            onChange={(e) => setFormData({ ...formData, profit_percent_plus: e.target.value })}
+                                            className="w-full bg-[#0F172A] border border-slate-700 rounded-lg px-2 py-1.5 text-slate-200 text-sm focus:outline-none focus:border-amber-500 transition-colors text-center font-bold"
+                                            placeholder="0"
+                                            min="0"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Server Management */}
                             <div>
-                                <label className="block text-sm font-medium text-slate-400 mb-2">Danh sách Server</label>
-                                <div className="space-y-3">
+                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Danh sách Server</label>
+                                <div className="space-y-2">
                                     <div className="flex gap-2">
                                         <input
                                             type="text"
                                             id="serverInput"
-                                            className="flex-1 bg-[#0F172A] border border-slate-700 rounded-xl px-4 py-2 text-slate-200 focus:outline-none focus:border-teal-500 transition-colors"
-                                            placeholder="Nhập tên server và nhấn Thêm"
+                                            className="flex-1 bg-[#0F172A] border border-slate-700 rounded-lg px-3 py-1.5 text-slate-200 text-sm focus:outline-none focus:border-teal-500 transition-colors"
+                                            placeholder="Tên server..."
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter') {
                                                     e.preventDefault();
@@ -362,14 +451,14 @@ export default function GameManagerPage() {
                                                     input.value = '';
                                                 }
                                             }}
-                                            className="px-4 py-2 bg-slate-800 text-teal-400 rounded-xl border border-teal-500/30 hover:bg-teal-500/10 transition-colors"
+                                            className="px-3 py-1.5 bg-slate-800 text-teal-400 rounded-lg border border-teal-500/30 text-xs font-bold hover:bg-teal-500/10 transition-colors"
                                         >
                                             Thêm
                                         </button>
                                     </div>
-                                    <div className="flex flex-wrap gap-2">
+                                    <div className="flex flex-wrap gap-2 max-h-20 overflow-y-auto">
                                         {(formData.server || []).map((srv, idx) => (
-                                            <span key={idx} className="bg-slate-800 border border-slate-600 text-slate-300 px-3 py-1 rounded-full text-sm flex items-center gap-2">
+                                            <span key={idx} className="bg-slate-800 border border-slate-600 text-slate-300 px-2 py-0.5 rounded text-xs flex items-center gap-1">
                                                 {srv}
                                                 <button
                                                     type="button"
@@ -380,7 +469,7 @@ export default function GameManagerPage() {
                                                     }}
                                                     className="hover:text-red-400 transition-colors"
                                                 >
-                                                    <FiX size={14} />
+                                                    <FiX size={12} />
                                                 </button>
                                             </span>
                                         ))}
@@ -390,19 +479,19 @@ export default function GameManagerPage() {
 
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-400 mb-2">Hình ảnh (Thumbnail)</label>
-                                <div className="flex gap-4 items-start">
+                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Hình ảnh</label>
+                                <div className="flex gap-3 items-center">
                                     <div
-                                        className="w-24 h-24 bg-slate-900 rounded-xl border-2 border-dashed border-slate-700 flex items-center justify-center overflow-hidden relative group cursor-pointer hover:border-teal-500 transition-colors"
+                                        className="w-16 h-16 bg-slate-900 rounded-lg border-2 border-dashed border-slate-700 flex items-center justify-center overflow-hidden relative group cursor-pointer hover:border-teal-500 transition-colors shrink-0"
                                         onClick={() => document.getElementById('thumbnail-upload').click()}
                                     >
                                         {previewImg ? (
                                             <img src={previewImg} className="w-full h-full object-cover" alt="Preview" />
                                         ) : (
-                                            <FiImage className="text-slate-600 group-hover:text-teal-500 transition-colors" size={24} />
+                                            <FiImage className="text-slate-600 group-hover:text-teal-500 transition-colors" size={20} />
                                         )}
                                         <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <FiEdit2 className="text-white" />
+                                            <FiEdit2 className="text-white" size={12} />
                                         </div>
                                     </div>
                                     <div className="flex-1">
@@ -416,34 +505,32 @@ export default function GameManagerPage() {
                                         <button
                                             type="button"
                                             onClick={() => document.getElementById('thumbnail-upload').click()}
-                                            className="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-sm hover:bg-slate-700 transition-colors border border-white/5"
+                                            className="px-3 py-1.5 bg-slate-800 text-slate-300 rounded-lg text-xs hover:bg-slate-700 transition-colors border border-white/5"
                                         >
                                             Chọn ảnh
                                         </button>
-                                        <p className="text-xs text-slate-500 mt-2">
-                                            Khuyến nghị: Tỉ lệ 16:9, dung lượng dưới 2MB.
-                                        </p>
                                     </div>
                                 </div>
                             </div>
-
-                            <div className="pt-4 border-t border-white/10 flex justify-end gap-3">
-                                <button
-                                    type="button"
-                                    onClick={handleCloseModal}
-                                    className="px-5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-colors font-medium"
-                                >
-                                    Hủy bỏ
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold shadow-lg shadow-teal-500/20 hover:shadow-teal-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2"
-                                >
-                                    <FiSave />
-                                    {currentGame ? "Lưu thay đổi" : "Thêm mới"}
-                                </button>
-                            </div>
                         </form>
+
+                        <div className="p-4 border-t border-white/10 bg-slate-900/50 flex justify-end gap-3 shrink-0">
+                            <button
+                                type="button"
+                                onClick={handleCloseModal}
+                                className="px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors font-medium text-sm"
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                type="submit"
+                                onClick={handleSubmit} // Move submit trigger here or keep in form
+                                className="px-4 py-2 rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold shadow-lg shadow-teal-500/20 hover:shadow-teal-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2 text-sm"
+                            >
+                                <FiSave size={16} />
+                                {currentGame ? "Lưu" : "Thêm"}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

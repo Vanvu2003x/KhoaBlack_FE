@@ -6,6 +6,9 @@ const api = axios.create({
   timeout: 30000 // 30 seconds timeout
 });
 
+console.log("Axios BaseURL:", api.defaults.baseURL);
+console.log("NEXT_PUBLIC_API_URL:", process.env.NEXT_PUBLIC_API_URL);
+
 // Response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
