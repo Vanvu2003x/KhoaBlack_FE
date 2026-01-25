@@ -19,6 +19,7 @@ export default function TopUpClient({ game, listPkg: initialListPkg }) {
     const [selectedPkg, setSelectedPkg] = useState(null);
     const [rechargeMethod, setRechargeMethod] = useState("uid"); // "uid" or "login"
     const [userLevel, setUserLevel] = useState(1); // Default to Basic (1)
+    const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
 
     // Form States
     const [idServer, setIdServer] = useState("");
@@ -45,10 +46,14 @@ export default function TopUpClient({ game, listPkg: initialListPkg }) {
                 const data = await getInfo();
                 if (data && data.user) {
                     setUserLevel(data.user.level || 1);
+                    setIsLoggedIn(true);
+                } else {
+                    setIsLoggedIn(false);
                 }
             } catch (error) {
                 // If not logged in or error, default to 1
                 setUserLevel(1);
+                setIsLoggedIn(false);
             }
         };
         fetchUserLevel();
@@ -86,8 +91,7 @@ export default function TopUpClient({ game, listPkg: initialListPkg }) {
     }, [listPkg, rechargeMethod]);
 
     const handleBuyNow = () => {
-        const token = localStorage.getItem("token");
-        if (!token) {
+        if (!isLoggedIn) {
             toast.error("Vui lòng đăng nhập để tiếp tục.");
             return;
         }
