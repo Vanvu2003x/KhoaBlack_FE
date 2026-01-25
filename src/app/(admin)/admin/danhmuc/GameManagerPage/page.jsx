@@ -238,7 +238,7 @@ export default function GameManagerPage() {
                         className="flex items-center gap-2 bg-slate-800 text-teal-400 border border-teal-500/30 px-5 py-2.5 rounded-xl font-bold hover:bg-teal-500/10 hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
                     >
                         <FiRefreshCw size={20} className={syncLoading ? "animate-spin" : ""} />
-                        <span className="hidden md:inline">{syncLoading ? "Đang đồng bộ..." : "Sync NapGame247"}</span>
+                        <span className="hidden md:inline">{syncLoading ? "Đang đồng bộ..." : "Sync"}</span>
                     </button>
                     <button
                         onClick={handleOpenAdd}
