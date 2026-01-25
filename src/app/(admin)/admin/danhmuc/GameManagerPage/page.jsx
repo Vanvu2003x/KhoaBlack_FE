@@ -43,7 +43,10 @@ export default function GameManagerPage() {
         server: [], // Array of server names
         profit_percent_basic: 0,
         profit_percent_pro: 0,
-        profit_percent_plus: 0
+        profit_percent_basic: 0,
+        profit_percent_pro: 0,
+        profit_percent_plus: 0,
+        origin_markup_percent: 0
     });
     const [thumbnailFile, setThumbnailFile] = useState(null);
     const [previewImg, setPreviewImg] = useState(null);
@@ -87,7 +90,10 @@ export default function GameManagerPage() {
             server: [],
             profit_percent_basic: 0,
             profit_percent_pro: 0,
-            profit_percent_plus: 0
+            profit_percent_basic: 0,
+            profit_percent_pro: 0,
+            profit_percent_plus: 0,
+            origin_markup_percent: 0
         });
         setThumbnailFile(null);
         setPreviewImg(null);
@@ -108,7 +114,9 @@ export default function GameManagerPage() {
             server: Array.isArray(game.server) ? game.server : [],
             profit_percent_basic: game.profit_percent_basic || 0,
             profit_percent_pro: game.profit_percent_pro || 0,
+            profit_percent_pro: game.profit_percent_pro || 0,
             profit_percent_plus: game.profit_percent_plus || 0,
+            origin_markup_percent: game.origin_markup_percent || 0,
         });
         setPreviewImg(process.env.NEXT_PUBLIC_API_URL + game.thumbnail);
         setThumbnailFile(null);
@@ -140,11 +148,13 @@ export default function GameManagerPage() {
             const data = new FormData();
 
             // Construct info object including profit fields
+            // Construct info object including profit fields
             const infoObj = {
                 ...formData,
                 profit_percent_basic: Number(formData.profit_percent_basic),
                 profit_percent_pro: Number(formData.profit_percent_pro),
-                profit_percent_plus: Number(formData.profit_percent_plus)
+                profit_percent_plus: Number(formData.profit_percent_plus),
+                origin_markup_percent: Number(formData.origin_markup_percent)
             };
 
             data.append("info", JSON.stringify(infoObj));
@@ -157,7 +167,8 @@ export default function GameManagerPage() {
                 await updateGame(currentGame.id, data);
                 if (currentGame.profit_percent_basic !== infoObj.profit_percent_basic ||
                     currentGame.profit_percent_pro !== infoObj.profit_percent_pro ||
-                    currentGame.profit_percent_plus !== infoObj.profit_percent_plus) {
+                    currentGame.profit_percent_plus !== infoObj.profit_percent_plus ||
+                    currentGame.origin_markup_percent !== infoObj.origin_markup_percent) {
                     toast.info("Đang cập nhật giá các gói nạp...");
                 }
                 toast.success("Cập nhật game thành công");
@@ -376,10 +387,22 @@ export default function GameManagerPage() {
 
                             {/* Profit Configuration */}
                             <div className="bg-slate-800/50 p-3 rounded-lg border border-white/5 space-y-2">
-                                <label className="block text-xs font-bold text-slate-500 uppercase">Lợi Nhuận Tự Động (%)</label>
-                                <div className="grid grid-cols-3 gap-3">
+                                <label className="block text-xs font-bold text-slate-500 uppercase">Cấu hình giá</label>
+                                <div className="grid grid-cols-4 gap-3">
+                                    <div className="bg-slate-900/50 p-2 rounded-lg border border-slate-700">
+                                        <label className="block text-[10px] uppercase text-slate-400 mb-1">Markup Nguồn (%)</label>
+                                        <input
+                                            type="number"
+                                            value={formData.origin_markup_percent}
+                                            onChange={(e) => setFormData({ ...formData, origin_markup_percent: e.target.value })}
+                                            className="w-full bg-[#0F172A] border border-slate-600 rounded-lg px-2 py-1.5 text-slate-200 text-sm focus:outline-none focus:border-red-500 transition-colors text-center font-bold"
+                                            placeholder="0"
+                                            min="0"
+                                            title="% tăng giá từ API gốc để tạo ra giá gốc của shop"
+                                        />
+                                    </div>
                                     <div>
-                                        <label className="block text-[10px] uppercase text-blue-400 mb-1">Basic</label>
+                                        <label className="block text-[10px] uppercase text-blue-400 mb-1">Lãi Basic (%)</label>
                                         <input
                                             type="number"
                                             value={formData.profit_percent_basic}
@@ -390,7 +413,7 @@ export default function GameManagerPage() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-[10px] uppercase text-purple-400 mb-1">Pro</label>
+                                        <label className="block text-[10px] uppercase text-purple-400 mb-1">Lãi Pro (%)</label>
                                         <input
                                             type="number"
                                             value={formData.profit_percent_pro}
@@ -401,7 +424,7 @@ export default function GameManagerPage() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-[10px] uppercase text-amber-400 mb-1">Plus</label>
+                                        <label className="block text-[10px] uppercase text-amber-400 mb-1">Lãi Plus (%)</label>
                                         <input
                                             type="number"
                                             value={formData.profit_percent_plus}
