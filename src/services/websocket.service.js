@@ -77,7 +77,18 @@ export const connectSocket = (token, onBalanceUpdate, onOrderUpdate) => {
     socket.on("connect_error", (error) => {
       console.error("❌ Socket connection error:", error.message);
       console.error("   Target URL:", URL);
-      console.error("   Make sure backend is running on this URL");
+
+      // Detect specific error types for better debugging
+      if (error.message.includes('CORS') || error.message.includes('cors')) {
+        console.error("   ⚠️ CORS issue detected! Check backend SOCKET_ORIGINS config");
+      }
+      if (error.message.includes('websocket') || error.type === 'TransportError') {
+        console.error("   ⚠️ WebSocket transport failed. Check Nginx WebSocket proxy config");
+        console.error("   Falling back to polling transport...");
+      }
+      if (error.message.includes('timeout')) {
+        console.error("   ⚠️ Connection timeout. Backend may not be responding");
+      }
     });
 
     socket.on("disconnect", (reason) => {

@@ -25,7 +25,7 @@ export default function AccSellingLog() {
         fetchOrders();
 
         // Listen for real-time order updates
-        const { connectSocket } = require("../../../../services/websocket.sever");
+        const { connectSocket } = require("../../../../services/websocket.service");
         const { unsubscribe } = connectSocket(
             null,
             null,

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getInfo } from "@/services/auth.service";
 import { getFinancialSummary } from "@/services/user.service";
-import { connectSocket } from "@/services/websocket.sever";
+import { connectSocket } from "@/services/websocket.service";
 import PaymentWallet from "./components/PaymentWallet";
 import AccountSidebar from "./components/AccountSidebar";
 import UserProfileCard from "./components/UserProfileCard";
@@ -210,7 +210,7 @@ export default function AccountPage() {
     };
 
     return (
-        <section className="min-h-screen bg-[#0F172A] py-8 px-4 md:px-6 lg:px-8 bg-[url('/bg-grid.svg')] bg-fixed font-sans">
+        <section className="min-h-screen bg-[#0F172A] py-8 px-4 md:px-6 lg:px-8 font-sans">
             <div className="max-w-7xl mx-auto">
                 <div className="flex flex-col lg:flex-row gap-8 items-start">
 

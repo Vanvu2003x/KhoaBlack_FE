@@ -118,7 +118,7 @@ export default function AccDetailPage() {
     const images = acc.images ? JSON.parse(acc.images) : (acc.image ? [acc.image] : [])
 
     return (
-        <div className="min-h-screen bg-[#0F172A] bg-[url('/bg-grid.svg')] bg-fixed">
+        <div className="min-h-screen bg-[#0F172A]">
             <div className="container mx-auto px-4 py-8">
                 {/* Back Button */}
                 <button

@@ -11,7 +11,7 @@ import { LuUserCheck, LuUserPlus } from "react-icons/lu";
 import LoginForm from "../auth/LoginForm";
 import RegisterForm from "../auth/RegisterForm";
 import { CiLogout } from "react-icons/ci";
-import { connectSocket } from "@/services/websocket.sever";
+import { connectSocket } from "@/services/websocket.service";
 import { Logout, getInfo } from "@/services/auth.service"; // Import Logout and getInfo
 import PaymentWallet from "@/app/(public)/account/components/PaymentWallet";
 

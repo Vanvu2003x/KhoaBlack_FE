@@ -50,6 +50,7 @@ export default function TopUpPackageManagerPage() {
         profit_percent_basic: "",
         profit_percent_pro: "",
         profit_percent_plus: "",
+        profit_percent_user: "", // Added
         package_type: "default",
         status: "active",
         id_server: false,
@@ -198,6 +199,15 @@ export default function TopUpPackageManagerPage() {
 
     const handleOpenAdd = () => {
         resetForm();
+        if (selectedGame) {
+            setFormData(prev => ({
+                ...prev,
+                profit_percent_basic: selectedGame.profit_percent_basic || 0,
+                profit_percent_pro: selectedGame.profit_percent_pro || 0,
+                profit_percent_plus: selectedGame.profit_percent_plus || 0,
+                profit_percent_user: 0,
+            }));
+        }
         setIsModalOpen(true);
     };
 
@@ -206,6 +216,12 @@ export default function TopUpPackageManagerPage() {
         setFormData({
             package_name: pkg.package_name,
             origin_price: pkg.origin_price || "",
+            // Use package's own percentages if set (or 0), loop back to game if desired? 
+            // DB stores 0 usually. Let's use what is in pkg.
+            profit_percent_basic: pkg.profit_percent_basic,
+            profit_percent_pro: pkg.profit_percent_pro,
+            profit_percent_plus: pkg.profit_percent_plus,
+            profit_percent_user: pkg.profit_percent_user || 0,
             package_type: pkg.package_type || "default",
             status: pkg.status || "active",
             id_server: pkg.id_server ? true : false,
@@ -263,6 +279,7 @@ export default function TopUpPackageManagerPage() {
             data.append("profit_percent_basic", formData.profit_percent_basic || 0);
             data.append("profit_percent_pro", formData.profit_percent_pro || 0);
             data.append("profit_percent_plus", formData.profit_percent_plus || 0);
+            data.append("profit_percent_user", formData.profit_percent_user || 0);
             data.append("package_type", formData.package_type);
             data.append("status", formData.status);
             data.append("id_server", formData.id_server ? 1 : 0); // Boolean to int often safer for FormData
@@ -589,37 +606,71 @@ export default function TopUpPackageManagerPage() {
                             </div>
 
                             {/* Auto Pricing Note */}
-                            <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl text-blue-200 text-sm flex gap-3">
-                                <FiActivity className="mt-0.5 shrink-0" />
-                                <div>
-                                    <p className="font-bold mb-1">Cơ chế tính giá tự động</p>
-                                    <p className="opacity-80">
-                                        Giá bán sẽ được tự động tính toán dựa trên <strong>Giá gốc</strong> và <strong>% Lợi nhuận</strong> được cấu hình tại cài đặt của Game.
-                                    </p>
+                            {/* Profit Configuration */}
+                            <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5 space-y-4">
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Cấu hình Lợi nhuận riêng</label>
 
-                                    {selectedGame && (
-                                        <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                            <div className="bg-slate-900/50 p-2 rounded border border-white/5">
-                                                <span className="text-xs text-slate-400 block">% Basic: {selectedGame.profit_percent_basic || 0}%</span>
-                                                <span className="text-sm font-bold text-blue-400">
-                                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.ceil((parseInt(formData.origin_price || 0)) * (1 + (parseInt(selectedGame.profit_percent_basic || 0) / 100))))}
-                                                </span>
-                                            </div>
-                                            <div className="bg-slate-900/50 p-2 rounded border border-white/5">
-                                                <span className="text-xs text-slate-400 block">% Pro: {selectedGame.profit_percent_pro || 0}%</span>
-                                                <span className="text-sm font-bold text-purple-400">
-                                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.ceil((parseInt(formData.origin_price || 0)) * (1 + (parseInt(selectedGame.profit_percent_pro || 0) / 100))))}
-                                                </span>
-                                            </div>
-                                            <div className="bg-slate-900/50 p-2 rounded border border-white/5">
-                                                <span className="text-xs text-slate-400 block">% Plus: {selectedGame.profit_percent_plus || 0}%</span>
-                                                <span className="text-sm font-bold text-amber-400">
-                                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.ceil((parseInt(formData.origin_price || 0)) * (1 + (parseInt(selectedGame.profit_percent_plus || 0) / 100))))}
-                                                </span>
-                                            </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                                    <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
+                                        <div className="flex justify-between mb-2">
+                                            <label className="text-xs font-bold text-teal-400 uppercase">Lãi User (%)</label>
+                                            <span className="text-xs text-slate-500">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.ceil((parseInt(formData.origin_price || 0)) * (1 + (parseFloat(formData.profit_percent_user || 0) / 100))))}</span>
                                         </div>
-                                    )}
+                                        <input
+                                            type="number"
+                                            value={formData.profit_percent_user}
+                                            onChange={(e) => setFormData({ ...formData, profit_percent_user: e.target.value })}
+                                            className="w-full bg-[#0F172A] border border-slate-600 rounded-lg px-2 py-1.5 text-slate-200 text-sm focus:outline-none focus:border-teal-500 transition-colors text-center font-bold"
+                                            placeholder="0"
+                                            min="0"
+                                        />
+                                    </div>
+                                    <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
+                                        <div className="flex justify-between mb-2">
+                                            <label className="text-xs font-bold text-blue-400 uppercase">Lãi Basic (%)</label>
+                                            <span className="text-xs text-slate-500">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.ceil((parseInt(formData.origin_price || 0)) * (1 + (parseFloat(formData.profit_percent_basic || 0) / 100))))}</span>
+                                        </div>
+                                        <input
+                                            type="number"
+                                            value={formData.profit_percent_basic}
+                                            onChange={(e) => setFormData({ ...formData, profit_percent_basic: e.target.value })}
+                                            className="w-full bg-[#0F172A] border border-slate-600 rounded-lg px-2 py-1.5 text-slate-200 text-sm focus:outline-none focus:border-blue-500 transition-colors text-center font-bold"
+                                            placeholder="0"
+                                            min="0"
+                                        />
+                                    </div>
+
+                                    <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
+                                        <div className="flex justify-between mb-2">
+                                            <label className="text-xs font-bold text-purple-400 uppercase">Lãi Pro (%)</label>
+                                            <span className="text-xs text-slate-500">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.ceil((parseInt(formData.origin_price || 0)) * (1 + (parseFloat(formData.profit_percent_pro || 0) / 100))))}</span>
+                                        </div>
+                                        <input
+                                            type="number"
+                                            value={formData.profit_percent_pro}
+                                            onChange={(e) => setFormData({ ...formData, profit_percent_pro: e.target.value })}
+                                            className="w-full bg-[#0F172A] border border-slate-600 rounded-lg px-2 py-1.5 text-slate-200 text-sm focus:outline-none focus:border-purple-500 transition-colors text-center font-bold"
+                                            placeholder="0"
+                                            min="0"
+                                        />
+                                    </div>
+
+                                    <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
+                                        <div className="flex justify-between mb-2">
+                                            <label className="text-xs font-bold text-amber-400 uppercase">Lãi Plus (%)</label>
+                                            <span className="text-xs text-slate-500">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.ceil((parseInt(formData.origin_price || 0)) * (1 + (parseFloat(formData.profit_percent_plus || 0) / 100))))}</span>
+                                        </div>
+                                        <input
+                                            type="number"
+                                            value={formData.profit_percent_plus}
+                                            onChange={(e) => setFormData({ ...formData, profit_percent_plus: e.target.value })}
+                                            className="w-full bg-[#0F172A] border border-slate-600 rounded-lg px-2 py-1.5 text-slate-200 text-sm focus:outline-none focus:border-amber-500 transition-colors text-center font-bold"
+                                            placeholder="0"
+                                            min="0"
+                                        />
+                                    </div>
                                 </div>
+                                <p className="text-[10px] text-slate-500 italic">*Mặc định hệ thống sẽ lấy theo cấu hình Game, bạn có thể nhập vào đây để ghi đè % lãi cho riêng gói này.</p>
                             </div>
 
                             {/* Configuration Toggles */}

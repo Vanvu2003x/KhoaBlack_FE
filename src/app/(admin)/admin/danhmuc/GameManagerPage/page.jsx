@@ -154,7 +154,7 @@ export default function GameManagerPage() {
                 profit_percent_basic: Number(formData.profit_percent_basic),
                 profit_percent_pro: Number(formData.profit_percent_pro),
                 profit_percent_plus: Number(formData.profit_percent_plus),
-                origin_markup_percent: Number(formData.origin_markup_percent)
+                origin_markup_percent: Number(String(formData.origin_markup_percent).replace(',', '.'))
             };
 
             data.append("info", JSON.stringify(infoObj));
@@ -390,15 +390,14 @@ export default function GameManagerPage() {
                                 <label className="block text-xs font-bold text-slate-500 uppercase">Cấu hình giá</label>
                                 <div className="grid grid-cols-4 gap-3">
                                     <div className="bg-slate-900/50 p-2 rounded-lg border border-slate-700">
-                                        <label className="block text-[10px] uppercase text-slate-400 mb-1">Markup Nguồn (%)</label>
+                                        <label className="block text-[10px] uppercase text-slate-400 mb-1">Hệ số Nguồn (x)</label>
                                         <input
-                                            type="number"
+                                            type="text"
                                             value={formData.origin_markup_percent}
                                             onChange={(e) => setFormData({ ...formData, origin_markup_percent: e.target.value })}
                                             className="w-full bg-[#0F172A] border border-slate-600 rounded-lg px-2 py-1.5 text-slate-200 text-sm focus:outline-none focus:border-red-500 transition-colors text-center font-bold"
-                                            placeholder="0"
-                                            min="0"
-                                            title="% tăng giá từ API gốc để tạo ra giá gốc của shop"
+                                            placeholder="1.0"
+                                            title="Hệ số nhân với giá API gốc để ra giá gốc của shop (Ví dụ: 1.1 = tăng 10%)"
                                         />
                                     </div>
                                     <div>

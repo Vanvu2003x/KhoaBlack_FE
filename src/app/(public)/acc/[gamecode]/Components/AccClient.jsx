@@ -92,7 +92,7 @@ export default function AccClient({ gamecode }) {
     const paginatedAcc = accList.slice(startIndex, startIndex + itemsPerPage)
 
     return (
-        <div className="min-h-screen bg-[#0F172A] bg-[url('/bg-grid.svg')] bg-fixed">
+        <div className="min-h-screen bg-[#0F172A]">
             <div className="container mx-auto px-4 py-8 md:py-12">
                 {/* Header Game */}
                 {loading ? (

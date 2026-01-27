@@ -1,6 +1,6 @@
 import "./globals.css";
 export const metadata = {
-    title: "KhoaBlack Topup",
+    title: "KhoaBlackTopup",
     description: "Nạp game uy tín chất lượng nhanh chóng",
     icons: {
         icon: [
