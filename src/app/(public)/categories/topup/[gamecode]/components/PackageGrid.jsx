@@ -140,9 +140,10 @@ export default function PackageGrid({
                                                 src={baseURLAPI + pkg.thumbnail}
                                                 alt={pkg.package_name}
                                                 className="w-full h-full object-contain"
-                                                onError={(e) =>
-                                                    (e.target.src = "/placeholder.png")
-                                                }
+                                                onError={(e) => {
+                                                    e.target.onerror = null; // Prevent infinite loop
+                                                    e.target.src = "/imgs/image.png"; // Fallback to logo if placeholder missing
+                                                }}
                                             />
                                         </div>
                                     </div>
