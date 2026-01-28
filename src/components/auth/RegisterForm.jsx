@@ -15,6 +15,7 @@ export default function RegisterForm({ onClose, onSwitch }) {
     const [rePassword, setRePassword] = useState("");
     const [OTP, setOTP] = useState("");
 
+    const [isLoading, setIsLoading] = useState(false);
     const [loadingOTP, setLoadingOTP] = useState(false);
     const [showOTP, setShowOTP] = useState(false);
     const [seconds, setSeconds] = useState(0);
@@ -32,6 +33,9 @@ export default function RegisterForm({ onClose, onSwitch }) {
         if (password !== rePassword) return toast.error("Hai mật khẩu không trùng khớp");
         if (!OTP) return toast.error("Chưa nhập mã OTP");
 
+        if (isLoading) return;
+        setIsLoading(true);
+
         try {
             const userData = await Register(username, email, password, OTP);
             // Backend now automatically logs in and sets cookie
@@ -41,6 +45,8 @@ export default function RegisterForm({ onClose, onSwitch }) {
             window.location.reload();
         } catch (error) {
             toast.error(error.response?.data?.message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -190,9 +196,20 @@ export default function RegisterForm({ onClose, onSwitch }) {
                 {/* Nút đăng ký */}
                 <button
                     onClick={handleRegister}
-                    className="w-full mt-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-3.5 rounded-xl hover:shadow-lg hover:shadow-blue-500/30 hover:to-indigo-600 transform transition-all active:scale-[0.98]"
+                    disabled={isLoading}
+                    className={`w-full mt-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-3.5 rounded-xl hover:shadow-lg hover:shadow-blue-500/30 hover:to-indigo-600 transform transition-all active:scale-[0.98] ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
                 >
-                    Đăng ký tài khoản
+                    {isLoading ? (
+                        <div className="flex items-center justify-center gap-2">
+                            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4l-3 3 3 3h-4z"></path>
+                            </svg>
+                            <span>Đang xử lý...</span>
+                        </div>
+                    ) : (
+                        "Đăng ký tài khoản"
+                    )}
                 </button>
 
                 {/* Switch to Login */}

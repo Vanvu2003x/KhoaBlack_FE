@@ -17,7 +17,11 @@ export default function LoginForm({ onClose, onSwitch }) {
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
+    const [isLoading, setIsLoading] = useState(false);
+
     const handleLogin = async () => {
+        if (isLoading) return;
+        setIsLoading(true);
         try {
             const userData = await Login(email, password);
             localStorage.setItem("name", userData.name_user);
@@ -26,6 +30,8 @@ export default function LoginForm({ onClose, onSwitch }) {
             window.location.reload();
         } catch (error) {
             toast.error("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -74,7 +80,7 @@ export default function LoginForm({ onClose, onSwitch }) {
             {/* Logo + Title */}
             <div className="flex flex-col items-center justify-center gap-3">
                 <div className="relative w-28 h-28 transform hover:scale-105 transition-transform duration-300">
-                    <img src="/imgs/khoablack-logo.png" alt="Logo" className="w-full h-full object-contain drop-shadow-md" />
+                    <img src="/imgs/image.png" alt="Logo" className="w-full h-full object-contain drop-shadow-md" />
                 </div>
                 <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
                     {!showForgot ? "Đăng Nhập" : "Quên Mật Khẩu"}
@@ -120,9 +126,20 @@ export default function LoginForm({ onClose, onSwitch }) {
 
                     <button
                         onClick={handleLogin}
-                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-3.5 rounded-xl hover:shadow-lg hover:shadow-blue-500/30 hover:to-indigo-600 transform transition-all active:scale-[0.98]"
+                        disabled={isLoading}
+                        className={`w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-3.5 rounded-xl hover:shadow-lg hover:shadow-blue-500/30 hover:to-indigo-600 transform transition-all active:scale-[0.98] ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
                     >
-                        Đăng nhập ngay
+                        {isLoading ? (
+                            <div className="flex items-center justify-center gap-2">
+                                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4l-3 3 3 3h-4z"></path>
+                                </svg>
+                                <span>Đang xử lý...</span>
+                            </div>
+                        ) : (
+                            "Đăng nhập ngay"
+                        )}
                     </button>
 
                     {/* Switch to Register */}
