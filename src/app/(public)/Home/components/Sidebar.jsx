@@ -27,8 +27,8 @@ export default function Sidebar() {
 
         fetchData();
 
-        // Refresh every 30 seconds to keep data updated (real-time-ish)
-        const interval = setInterval(fetchData, 30000);
+        // Refresh every 1 hour (3600000 seconds) to reduce server load
+        const interval = setInterval(fetchData, 3600000);
 
         return () => clearInterval(interval);
     }, []);
@@ -37,6 +37,13 @@ export default function Sidebar() {
     const maskID = (id) => {
         if (!id) return "***";
         return `ID: ${id.substring(0, 3)}***${id.substring(id.length - 2)}`;
+    };
+
+    // Helper to mask Name for privacy
+    const maskName = (name) => {
+        if (!name) return "***";
+        if (name.length <= 3) return name.charAt(0) + "***";
+        return name.substring(0, 2) + "***" + name.charAt(name.length - 1);
     };
 
     // Helper to format currency
@@ -90,7 +97,7 @@ export default function Sidebar() {
                                     </div>
                                     <div className="flex flex-col min-w-0">
                                         <span className={`font-bold text-sm truncate transition-colors ${index < 3 ? 'text-white' : 'text-slate-200 group-hover:text-indigo-400'}`}>
-                                            {user.name}
+                                            {maskName(user.name)}
                                         </span>
                                         <span className="text-xs text-slate-500">{maskID(user.id)}</span>
                                     </div>

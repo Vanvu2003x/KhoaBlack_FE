@@ -74,7 +74,7 @@ export default function LoginForm({ onClose, onSwitch }) {
             {/* Logo + Title */}
             <div className="flex flex-col items-center justify-center gap-3">
                 <div className="relative w-28 h-28 transform hover:scale-105 transition-transform duration-300">
-                    <img src="/imgs/logo.png" alt="Logo" className="w-full h-full object-contain drop-shadow-md" />
+                    <img src="/imgs/image.png" alt="Logo" className="w-full h-full object-contain drop-shadow-md" />
                 </div>
                 <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
                     {!showForgot ? "Đăng Nhập" : "Quên Mật Khẩu"}

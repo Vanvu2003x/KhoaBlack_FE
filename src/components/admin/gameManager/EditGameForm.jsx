@@ -6,7 +6,7 @@ import { useToast } from "@/components/ui/Toast"
 
 export default function EditGameForm({ game, onCancel }) {
     const toast = useToast();
-    const [imgurl, setImgurl] = useState(`http://localhost:5000${game.thumbnail}`)
+    const [imgurl, setImgurl] = useState(`${process.env.NEXT_PUBLIC_API_URL}${game.thumbnail}`)
     const [img, setImg] = useState(null)
     const [name, setName] = useState(game.name)
     const [publisher, setPublisher] = useState(game.publisher)

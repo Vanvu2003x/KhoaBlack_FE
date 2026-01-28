@@ -5,7 +5,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 
 export default function Loading() {
     return (
-        <section className="min-h-screen bg-[#0F172A] py-8 px-4 md:px-6 lg:px-8 bg-[url('/bg-grid.svg')] bg-fixed font-sans">
+        <section className="min-h-screen bg-[#0F172A] py-8 px-4 md:px-6 lg:px-8 font-sans">
             <SkeletonTheme baseColor="#1E293B" highlightColor="#334155">
                 <div className="max-w-7xl mx-auto space-y-8 animate-pulse">
                     {/* Hero Section Skeleton */}

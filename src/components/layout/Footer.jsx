@@ -11,8 +11,8 @@ export default function Footer() {
                 <div className="flex flex-col items-center md:items-start gap-4">
                     <div className="relative w-24 h-24 transition-transform hover:scale-105 duration-300">
                         <Image
-                            src="/imgs/logo.png"
-                            alt="Logo"
+                            src="/imgs/image.png"
+                            alt="KhoaBlack Topup"
                             fill
                             className="object-contain drop-shadow-lg"
                         />
@@ -55,7 +55,7 @@ export default function Footer() {
             <div className="bg-[#0a0a0a] border-t border-gray-800 py-6 px-6 md:px-10">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-sm font-medium">
                     <div className="text-gray-500">
-                        © 2025 Napgameuytin. All rights reserved. <span className="hidden md:inline">|</span> Phát triển bởi <span className="text-amber-500 font-bold hover:text-amber-400 duration-200 cursor-pointer">Van Vu</span>
+                        © 2026 KhoaBlackTopup. All rights reserved. <span className="hidden md:inline">|</span> Phát triển bởi <span className="text-amber-500 font-bold hover:text-amber-400 duration-200 cursor-pointer">Van Vu</span>
                     </div>
                     <div className="flex gap-5 text-xl">
                         <Link href="https://github.com/Vanvu2003x" className="text-gray-500 hover:text-white hover:scale-110 transition-all duration-200"><FaGithub /></Link>

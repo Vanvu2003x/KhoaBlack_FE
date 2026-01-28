@@ -1,171 +1,67 @@
-"use client"
-import { useParams } from "next/navigation"
-import { useEffect, useState } from "react"
-import Skeleton from "react-loading-skeleton"
-import "react-loading-skeleton/dist/skeleton.css"
-import { getGameByGameCode } from "@/services/games.service"
-import { getAllAcc } from "@/services/acc.service"
-import AccCardItem from "./Components/accCard"
+import AccClient from "./Components/AccClient";
 
-export default function Acc() {
-    const params = useParams()
-    const gamecode = params?.gamecode
-    const baseURLAPI = process.env.NEXT_PUBLIC_API_URL
+// Dynamic metadata for SEO
+export async function generateMetadata({ params }) {
+    const { gamecode } = params;
+    // Ưu tiên sử dụng API_URL (internal) nếu có để tránh lỗi loopback trên VPS
+    const apiUrl = process.env.INTERNAL_API_URL || process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
 
-    const [game, setGame] = useState(null)
-    const [allAccList, setAllAccList] = useState([]) // dữ liệu gốc
-    const [accList, setAccList] = useState([]) // dữ liệu hiển thị
-    const [loading, setLoading] = useState(true)
-
-    // bộ lọc
-    const [keyword, setKeyword] = useState("")
-    const [minPrice, setMinPrice] = useState("")
-    const [maxPrice, setMaxPrice] = useState("")
-
-    // phân trang
-    const [currentPage, setCurrentPage] = useState(1)
-    const itemsPerPage = 8
-
-    // fetch dữ liệu 1 lần khi load page
-    useEffect(() => {
-        if (!gamecode) return
-
-        const fetchData = async () => {
-            try {
-                const gameData = await getGameByGameCode(gamecode)
-                setGame(gameData)
-
-                const accData = await getAllAcc(gameData.id)
-                // chỉ lấy acc đang selling
-                const sellingAcc = accData.data.data.filter(acc => acc.status === "selling")
-                setAllAccList(sellingAcc)
-                setAccList(sellingAcc)
-            } catch (error) {
-                console.error("Lỗi khi fetch dữ liệu:", error)
-            } finally {
-                setLoading(false)
-            }
+    try {
+        // Fetch game data for SEO
+        const response = await fetch(`${apiUrl}/api/games/game/${gamecode}`);
+        if (!response.ok) {
+            // If the response is not OK, throw an error or return default metadata
+            console.error(`Failed to fetch game data: ${response.status} ${response.statusText}`);
+            return {
+                title: "Mua Nick Game - KhoaBlack",
+                description: "Shop bán acc game uy tín, giá rẻ, bảo hành trọn đời.",
+            };
         }
+        const game = await response.json();
 
-        fetchData()
-    }, [gamecode])
-
-    // filter ở FE khi gõ keyword hoặc thay đổi giá
-    const handleFilter = () => {
-        const filtered = allAccList.filter(acc => {
-            const k = keyword.toLowerCase()
-
-            // check id
-            const matchId = acc.id?.toString().includes(k)
-
-            // check info (loại bỏ thẻ HTML để search text)
-            const infoText = acc.info?.replace(/<[^>]+>/g, "").toLowerCase() || ""
-            const matchInfo = infoText.includes(k)
-
-            const matchMin = minPrice ? acc.price >= parseInt(minPrice) : true
-            const matchMax = maxPrice ? acc.price <= parseInt(maxPrice) : true
-
-            return (matchId || matchInfo) && matchMin && matchMax
-        })
-
-        setAccList(filtered)
-        setCurrentPage(1)
+        if (game) {
+            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://khoablacktopup.vn";
+            return {
+                title: `Mua Nick ${game.name} - Giá Rẻ, Uy Tín, Bảo Hành | KhoaBlack`,
+                description: `Shop bán acc ${game.name} giá rẻ, uy tín. Tài khoản chất lượng, bảo hành trọn đời, giao dịch tự động 24/7.`,
+                keywords: [`mua nick ${game.name}`, `acc ${game.name}`, `shop acc ${game.name}`, "bán acc game", "khoablack"],
+                openGraph: {
+                    title: `Mua Nick ${game.name} Giá Rẻ | KhoaBlack`,
+                    description: `Shop bán acc ${game.name} uy tín nhất. Giá rẻ, bảo hành, giao dịch tự động.`,
+                    images: [
+                        {
+                            url: process.env.NEXT_PUBLIC_API_URL + game.thumbnail,
+                            width: 800,
+                            height: 600,
+                            alt: `Acc ${game.name}`,
+                        },
+                    ],
+                    type: "website",
+                    locale: "vi_VN",
+                },
+                twitter: {
+                    card: "summary_large_image",
+                    title: `Mua Nick ${game.name}`,
+                    description: `Shop acc ${game.name} uy tín, giá rẻ.`,
+                    images: [process.env.NEXT_PUBLIC_API_URL + game.thumbnail],
+                },
+                alternates: {
+                    canonical: `${baseUrl}/acc/${gamecode}`,
+                },
+            };
+        }
+    } catch (error) {
+        console.error("Error generating acc metadata:", error);
     }
 
+    return {
+        title: "Mua Nick Game - KhoaBlack",
+        description: "Shop bán acc game uy tín, giá rẻ, bảo hành trọn đời.",
+    };
+}
 
-    // gọi filter mỗi khi keyword hoặc giá thay đổi
-    useEffect(() => {
-        handleFilter()
-    }, [keyword, minPrice, maxPrice, allAccList])
-
-    // phân trang
-    const totalPages = Math.ceil(accList.length / itemsPerPage)
-    const startIndex = (currentPage - 1) * itemsPerPage
-    const paginatedAcc = accList.slice(startIndex, startIndex + itemsPerPage)
-
-    return (
-        <div className="p-6 md:p-10 min-h-screen bg-gray-100">
-            {/* header game */}
-            {loading ? (
-                <div className="p-4 bg-white rounded-lg shadow flex gap-4 items-center">
-                    <Skeleton width={72} height={72} className="rounded-md" />
-                    <div className="flex-1 space-y-2">
-                        <Skeleton width="60%" height={20} />
-                        <Skeleton width="40%" height={16} />
-                    </div>
-                </div>
-            ) : (
-                game && (
-                    <div className="p-5 bg-white rounded-lg shadow flex gap-4 items-center mb-8">
-                        <img
-                            src={baseURLAPI + game.thumbnail}
-                            alt={`Ảnh game ${game.name}`}
-                            className="w-[72px] h-[72px] object-cover rounded-md border"
-                        />
-                        <div>
-                            <h1 className="text-xl font-bold text-gray-800">{game.name}</h1>
-                            <h2 className="text-sm text-gray-500">{game.publisher}</h2>
-                        </div>
-                    </div>
-                )
-            )}
-
-            {/* bộ lọc */}
-            <div className="bg-white p-4 rounded-lg shadow mb-6 flex gap-4 flex-wrap items-end">
-                <input
-                    type="text"
-                    placeholder="Tìm kiếm theo thông tin acc, id acc..."
-                    value={keyword}
-                    onChange={e => setKeyword(e.target.value)}
-                    className="border rounded p-2 flex-1"
-                />
-                <input
-                    type="number"
-                    placeholder="Giá tối thiểu"
-                    value={minPrice}
-                    onChange={e => setMinPrice(e.target.value)}
-                    className="border rounded p-2 w-40"
-                />
-                <input
-                    type="number"
-                    placeholder="Giá tối đa"
-                    value={maxPrice}
-                    onChange={e => setMaxPrice(e.target.value)}
-                    className="border rounded p-2 w-40"
-                />
-            </div>
-
-            {/* Danh sách acc */}
-            <div className="bg-white p-10">
-                <h2 className="font-semibold text-gray-800 mb-4 text-xl">
-                    Danh sách tài khoản
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {paginatedAcc.length > 0 ? (
-                        paginatedAcc.map(acc => <AccCardItem key={acc.id} acc={acc} />)
-                    ) : (
-                        <p className="text-gray-500 col-span-full text-center py-8">
-                            Không tìm thấy tài khoản nào
-                        </p>
-                    )}
-                </div>
-
-                {/* Pagination */}
-                {totalPages > 1 && (
-                    <div className="flex justify-center mt-6 gap-2">
-                        {Array.from({ length: totalPages }).map((_, idx) => (
-                            <button
-                                key={idx}
-                                onClick={() => setCurrentPage(idx + 1)}
-                                className={`px-3 py-1 border rounded ${currentPage === idx + 1 ? "bg-blue-500 text-white" : "bg-white"
-                                    }`}
-                            >
-                                {idx + 1}
-                            </button>
-                        ))}
-                    </div>
-                )}
-            </div>
-        </div>
-    )
+// Server Component wrapper
+export default async function AccPage(props) {
+    const params = await props.params;
+    return <AccClient gamecode={params?.gamecode} />;
 }

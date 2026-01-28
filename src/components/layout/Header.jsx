@@ -11,7 +11,7 @@ import { LuUserCheck, LuUserPlus } from "react-icons/lu";
 import LoginForm from "../auth/LoginForm";
 import RegisterForm from "../auth/RegisterForm";
 import { CiLogout } from "react-icons/ci";
-import { connectSocket } from "@/services/websocket.sever";
+import { connectSocket } from "@/services/websocket.service";
 import { Logout, getInfo } from "@/services/auth.service"; // Import Logout and getInfo
 import PaymentWallet from "@/app/(public)/account/components/PaymentWallet";
 
@@ -26,6 +26,8 @@ export default function Header() {
     const [openMobileMenu, setOpenMobileMenu] = useState(false);
 
     useEffect(() => {
+        let unsubscribeSocket = null;
+
         const fetchUserData = async () => {
             try {
                 const data = await getInfo();
@@ -37,9 +39,11 @@ export default function Header() {
                         setBalance(user.balance || 0);
                         localStorage.setItem("name", user.name);
 
-                        connectSocket(null, (newBalance) => {
+                        const token = localStorage.getItem("token");
+                        const connection = connectSocket(token, (newBalance) => {
                             setBalance(newBalance);
                         });
+                        unsubscribeSocket = connection.unsubscribe;
                     }
                 }
             } catch (err) {
@@ -51,6 +55,13 @@ export default function Header() {
         };
 
         fetchUserData();
+
+        // Cleanup listener on unmount
+        return () => {
+            if (unsubscribeSocket) {
+                unsubscribeSocket();
+            }
+        };
     }, []);
 
     // I need to see what API returns. 
@@ -122,14 +133,14 @@ export default function Header() {
                         </button>
 
                         <Link href="/" className="relative group">
-                            <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform duration-300">
-                                    <span className="text-white font-bold text-lg md:text-xl">N</span>
-                                </div>
-                                <span className="text-lg md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 block">
-                                    NEXUS<span className="text-indigo-400">PAY</span>
-                                </span>
-                            </div>
+                            <Image
+                                src="/imgs/image.png"
+                                alt="KhoaBlack Topup"
+                                width={200}
+                                height={80}
+                                className="h-12 md:h-16 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+                                priority
+                            />
                         </Link>
 
                         {/* Navigation - Desktop */}
@@ -287,12 +298,13 @@ export default function Header() {
                     <div className="p-5 flex flex-col h-full">
                         {/* Header Drawer */}
                         <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
-                            <div className="flex items-center gap-2">
-                                <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                                    <span className="text-white font-bold text-xl">N</span>
-                                </div>
-                                <span className="font-bold text-white text-lg">NEXUS<span className="text-indigo-400">PAY</span></span>
-                            </div>
+                            <Image
+                                src="/imgs/image.png"
+                                alt="KhoaBlack Topup"
+                                width={140}
+                                height={50}
+                                className="h-12 w-auto object-contain"
+                            />
                             <button
                                 onClick={() => setOpenMobileMenu(false)}
                                 className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all"

@@ -9,7 +9,7 @@ export const metadata = {
     authors: [{ name: "KhoaBlack" }],
     creator: "KhoaBlack",
     publisher: "KhoaBlack",
-    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://khoablack.com"),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://khoablacktopup.vn"),
     alternates: {
         canonical: "/",
     },

@@ -25,35 +25,53 @@ export default function PublicLayout({ children }) {
             {children}
             <Footer />
 
-            {/* Box thông báo */}
+            {/* Box thông báo - Dark Theme Modal */}
             {showNotice && (
-                <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+                <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50">
                     <div
-                        className="bg-white p-6 rounded-lg shadow-lg max-w-sm text-center 
+                        className="relative bg-gradient-to-br from-[#1E293B] to-[#0F172A] p-8 rounded-2xl max-w-md text-center 
+                        border border-indigo-500/30 shadow-[0_0_40px_rgba(99,102,241,0.3)]
                         animate-[scaleIn_0.3s_ease]"
                     >
-                        <h3 className="text-lg font-bold mb-3">Chào mừng bạn!</h3>
-                        <p className="text-gray-700 mb-4">
-                            Chào mừng anh em tới web nạp của Khoa Black
+                        {/* Glow effect */}
+                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 blur-xl -z-10"></div>
+
+                        {/* Icon */}
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/40">
+                            <span className="text-3xl animate-pulse">🔥</span>
+                        </div>
+
+                        <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                            Chào mừng bạn!
+                        </h3>
+                        <p className="text-slate-300 mb-4 text-sm">
+                            Chào mừng anh em tới web nạp của <span className="text-indigo-400 font-semibold">Khoa Black</span>
                         </p>
-                        <p className="text-gray-700 mb-4">
-                            Nếu gặp bất cứ vấn đề gì trong quá trình sử dụng dịch vụ của shop
-                            thì anh em yên tâm, mọi vấn đề sẽ được hỗ trợ nhanh chóng.
-                            Liên hệ Zalo:{" "}
-                            <a
-                                target="_blank"
-                                href="https://zalo.me/0866996056"
-                                className="text-blue-600 underline"
-                            >
-                                0866996056
-                            </a>
-                            . Cảm ơn anh em đã quan tâm.
-                        </p>
+                        <div className="bg-slate-800/50 rounded-xl p-4 mb-5 border border-slate-700/50">
+                            <p className="text-slate-400 text-sm leading-relaxed">
+                                Nếu gặp bất cứ vấn đề gì trong quá trình sử dụng dịch vụ,
+                                anh em yên tâm, mọi vấn đề sẽ được hỗ trợ <span className="text-emerald-400 font-medium">nhanh chóng</span>.
+                            </p>
+                            <div className="mt-3 flex items-center justify-center gap-2">
+                                <SiZalo className="text-green-400 w-5 h-5" />
+                                <span className="text-slate-400 text-sm">Liên hệ Zalo:</span>
+                                <a
+                                    target="_blank"
+                                    href="https://zalo.me/0866996056"
+                                    className="text-green-400 font-semibold hover:text-green-300 transition-colors"
+                                >
+                                    0866996056
+                                </a>
+                            </div>
+                        </div>
                         <button
                             onClick={() => setShowNotice(false)}
-                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                            className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl 
+                            hover:from-indigo-500 hover:to-purple-500 transition-all duration-300
+                            shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50
+                            active:scale-[0.98]"
                         >
-                            Đã hiểu
+                            ✨ Đã hiểu
                         </button>
                     </div>
                 </div>

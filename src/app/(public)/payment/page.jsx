@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getSocket } from "@/services/websocket.sever";
+import { getSocket } from "@/services/websocket.service";
 import { useToast } from "@/components/ui/Toast";
 import { cancelPaymentAPI } from "@/services/payment.service";
 import { FiCopy, FiClock, FiCheckCircle, FiAlertTriangle, FiX, FiShield, FiCreditCard } from "react-icons/fi";

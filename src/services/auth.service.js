@@ -36,8 +36,15 @@ export const getRole = async () => {
 };
 
 export const getInfo = async () => {
-    const res = await api.get("/api/users");
-    return res.data;
+    try {
+        const res = await api.get("/api/users");
+        return res.data;
+    } catch (error) {
+        if (error.response && error.response.status === 401) {
+            return null;
+        }
+        throw error;
+    }
 };
 
 // Gửi OTP để lấy lại mật khẩu

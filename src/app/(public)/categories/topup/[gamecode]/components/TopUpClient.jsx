@@ -10,6 +10,7 @@ import TopUpForm from "./TopUpForm";
 import PackageGrid from "./PackageGrid";
 import OrderSummary from "./OrderSummary";
 import ImportantNotes from "./ImportantNotes";
+import { getInfo } from "@/services/auth.service";
 
 export default function TopUpClient({ game, listPkg: initialListPkg }) {
     const toast = useToast();
@@ -17,6 +18,8 @@ export default function TopUpClient({ game, listPkg: initialListPkg }) {
     const [loading, setLoading] = useState(!initialListPkg);
     const [selectedPkg, setSelectedPkg] = useState(null);
     const [rechargeMethod, setRechargeMethod] = useState("uid"); // "uid" or "login"
+    const [userLevel, setUserLevel] = useState(1); // Default to Basic (1)
+    const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
 
     // Form States
     const [idServer, setIdServer] = useState("");
@@ -35,6 +38,26 @@ export default function TopUpClient({ game, listPkg: initialListPkg }) {
             setServer(game.server[0]);
         }
     }, [game]);
+
+    // Fetch User Level
+    useEffect(() => {
+        const fetchUserLevel = async () => {
+            try {
+                const data = await getInfo();
+                if (data && data.user) {
+                    setUserLevel(data.user.level || 1);
+                    setIsLoggedIn(true);
+                } else {
+                    setIsLoggedIn(false);
+                }
+            } catch (error) {
+                // If not logged in or error, default to 1
+                setUserLevel(1);
+                setIsLoggedIn(false);
+            }
+        };
+        fetchUserLevel();
+    }, []);
 
     // Handle initial loading if data not passed from server
     useEffect(() => {
@@ -68,8 +91,7 @@ export default function TopUpClient({ game, listPkg: initialListPkg }) {
     }, [listPkg, rechargeMethod]);
 
     const handleBuyNow = () => {
-        const token = localStorage.getItem("token");
-        if (!token) {
+        if (!isLoggedIn) {
             toast.error("Vui lòng đăng nhập để tiếp tục.");
             return;
         }
@@ -80,12 +102,12 @@ export default function TopUpClient({ game, listPkg: initialListPkg }) {
 
         // Validation logic
         if (rechargeMethod === "uid") {
-            if (game?.sever?.length > 1 && !server) {
+            if (game?.server?.length > 1 && !server) {
                 toast.warn("Vui lòng chọn Server.");
                 return;
             }
             if (
-                game?.sever?.length === 0 &&
+                game?.server?.length === 0 &&
                 selectedPkg.id_server &&
                 !idServer
             ) {
@@ -174,6 +196,7 @@ export default function TopUpClient({ game, listPkg: initialListPkg }) {
                             displayPackages={displayPackages}
                             selectedPkg={selectedPkg}
                             setSelectedPkg={setSelectedPkg}
+                            userLevel={userLevel}
                         />
 
                         {/* Empty State */}

@@ -32,8 +32,6 @@ import Swal from "sweetalert2";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function TopUpPackageManagerPage() {
-    const toast = useToast();
-
     // --- State Management ---
     const [games, setGames] = useState([]);
     const [selectedGame, setSelectedGame] = useState(null);
@@ -48,8 +46,11 @@ export default function TopUpPackageManagerPage() {
     // Form State
     const [formData, setFormData] = useState({
         package_name: "",
-        price: "",
         origin_price: "",
+        profit_percent_basic: "",
+        profit_percent_pro: "",
+        profit_percent_plus: "",
+        profit_percent_user: "", // Added
         package_type: "default",
         status: "active",
         id_server: false,
@@ -92,7 +93,6 @@ export default function TopUpPackageManagerPage() {
             setPackages(data || []);
         } catch (error) {
             console.error("Error fetching packages:", error);
-            // toast.error("Lỗi khi tải gói nạp"); // Optional: reduce noise
         } finally {
             setLoading(false);
         }
@@ -112,8 +112,6 @@ export default function TopUpPackageManagerPage() {
         }
 
         try {
-            // Use search service if available, or client-side filter could be fallback
-            // The service requires game_id and keyword
             const data = await searchPkg(selectedGame.id, val);
             setPackages(data || []);
         } catch (error) {
@@ -147,12 +145,46 @@ export default function TopUpPackageManagerPage() {
         }
     };
 
+    const handleDetail = (pkg) => {
+        const formatMoney = (amount) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+
+        Swal.fire({
+            title: `Chi tiết: ${pkg.package_name}`,
+            html: `
+                <div class="text-left space-y-3 bg-[#1E293B] p-4 rounded-xl border border-white/10 text-slate-300">
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span class="text-slate-500">Giá Nhập (Gốc):</span>
+                        <span class="font-bold text-white">${formatMoney(pkg.origin_price || 0)}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-blue-400">Giá Basic:</span>
+                        <span class="font-bold text-blue-400">${formatMoney(pkg.price_basic || 0)}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-purple-400">Giá Pro:</span>
+                        <span class="font-bold text-purple-400">${formatMoney(pkg.price_pro || 0)}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-amber-400">Giá Plus:</span>
+                        <span class="font-bold text-amber-400">${formatMoney(pkg.price_plus || 0)}</span>
+                    </div>
+                    <div class="pt-2 border-t border-white/5 text-xs text-center italic text-slate-500">
+                        *Giá được tính tự động theo cấu hình Game
+                    </div>
+                </div>
+            `,
+            background: '#0F172A',
+            color: '#fff',
+            showConfirmButton: false,
+            showCloseButton: true,
+        });
+    };
+
     // --- Modal & Form Handlers ---
 
     const resetForm = () => {
         setFormData({
             package_name: "",
-            price: "",
             origin_price: "",
             package_type: "default",
             status: "active",
@@ -167,6 +199,15 @@ export default function TopUpPackageManagerPage() {
 
     const handleOpenAdd = () => {
         resetForm();
+        if (selectedGame) {
+            setFormData(prev => ({
+                ...prev,
+                profit_percent_basic: selectedGame.profit_percent_basic || 0,
+                profit_percent_pro: selectedGame.profit_percent_pro || 0,
+                profit_percent_plus: selectedGame.profit_percent_plus || 0,
+                profit_percent_user: 0,
+            }));
+        }
         setIsModalOpen(true);
     };
 
@@ -174,8 +215,13 @@ export default function TopUpPackageManagerPage() {
         setCurrentPackage(pkg);
         setFormData({
             package_name: pkg.package_name,
-            price: pkg.price,
             origin_price: pkg.origin_price || "",
+            // Use package's own percentages if set (or 0), loop back to game if desired? 
+            // DB stores 0 usually. Let's use what is in pkg.
+            profit_percent_basic: pkg.profit_percent_basic,
+            profit_percent_pro: pkg.profit_percent_pro,
+            profit_percent_plus: pkg.profit_percent_plus,
+            profit_percent_user: pkg.profit_percent_user || 0,
             package_type: pkg.package_type || "default",
             status: pkg.status || "active",
             id_server: pkg.id_server ? true : false,
@@ -207,8 +253,8 @@ export default function TopUpPackageManagerPage() {
             toast.error("Vui lòng chọn game trước");
             return;
         }
-        if (!formData.package_name || !formData.price) {
-            toast.warning("Vui lòng nhập tên gói và giá");
+        if (!formData.package_name) {
+            toast.warning("Vui lòng nhập tên gói");
             return;
         }
 
@@ -229,8 +275,11 @@ export default function TopUpPackageManagerPage() {
 
             data.append("package_name", formData.package_name);
             data.append("game_id", selectedGame.id); // Important
-            data.append("price", formData.price);
             data.append("origin_price", formData.origin_price || 0);
+            data.append("profit_percent_basic", formData.profit_percent_basic || 0);
+            data.append("profit_percent_pro", formData.profit_percent_pro || 0);
+            data.append("profit_percent_plus", formData.profit_percent_plus || 0);
+            data.append("profit_percent_user", formData.profit_percent_user || 0);
             data.append("package_type", formData.package_type);
             data.append("status", formData.status);
             data.append("id_server", formData.id_server ? 1 : 0); // Boolean to int often safer for FormData
@@ -274,7 +323,7 @@ export default function TopUpPackageManagerPage() {
         <div className="space-y-6 animate-[fadeIn_0.5s_ease-out]">
 
             {/* Header & Controls */}
-            <div className="flex flex-col md:flex-col lg:flex-row gap-6 bg-[#1E293B]/50 backdrop-blur-xl p-6 rounded-2xl border border-white/5 shadow-xl">
+            <div className="relative z-50 flex flex-col md:flex-col lg:flex-row gap-6 bg-[#1E293B]/50 backdrop-blur-xl p-6 rounded-2xl border border-white/5 shadow-xl">
                 <div className="flex-1">
                     <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
                         Quản lý Gói Nạp
@@ -286,7 +335,7 @@ export default function TopUpPackageManagerPage() {
 
                 <div className="flex flex-col sm:flex-row gap-4">
                     {/* Game Selector */}
-                    <div className="w-full sm:w-64 z-20">
+                    <div className="w-full sm:w-64 z-30">
                         <Listbox value={selectedGame} onChange={setSelectedGame}>
                             <div className="relative mt-1">
                                 <Listbox.Button className="relative w-full cursor-pointer rounded-xl bg-[#0F172A] py-2.5 pl-3 pr-10 text-left border border-white/10 focus:outline-none focus:border-blue-500 sm:text-sm text-white shadow-lg transition-colors hover:border-blue-500/50">
@@ -312,7 +361,7 @@ export default function TopUpPackageManagerPage() {
                                     leaveFrom="opacity-100"
                                     leaveTo="opacity-0"
                                 >
-                                    <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-xl bg-[#1E293B] py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm border border-white/10 z-50">
+                                    <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-xl bg-[#1E293B] py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm border border-white/10 z-[100]">
                                         {games.map((game, gameIdx) => (
                                             <Listbox.Option
                                                 key={gameIdx}
@@ -428,6 +477,13 @@ export default function TopUpPackageManagerPage() {
                                 {/* Hover Actions */}
                                 <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
                                     <button
+                                        onClick={() => handleDetail(pkg)}
+                                        className="p-2 bg-white/10 backdrop-blur-md rounded-lg text-white hover:bg-emerald-500 hover:text-white transition-colors shadow-lg"
+                                        title="Chi tiết giá"
+                                    >
+                                        <FiLayers size={16} />
+                                    </button>
+                                    <button
                                         onClick={() => handleOpenEdit(pkg)}
                                         className="p-2 bg-white/10 backdrop-blur-md rounded-lg text-white hover:bg-blue-500 hover:text-white transition-colors shadow-lg"
                                         title="Chỉnh sửa"
@@ -452,13 +508,9 @@ export default function TopUpPackageManagerPage() {
 
                                 <div className="mt-auto pt-3 border-t border-white/5 flex items-end justify-between">
                                     <div>
-                                        {pkg.origin_price && pkg.origin_price > pkg.price && (
-                                            <p className="text-xs text-slate-500 line-through mb-0.5">
-                                                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(pkg.origin_price)}
-                                            </p>
-                                        )}
-                                        <p className="text-lg font-bold text-blue-400">
-                                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(pkg.price)}
+                                        <p className="text-xs text-slate-500 mb-0.5">Giá gốc</p>
+                                        <p className="text-lg font-bold text-emerald-400">
+                                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(pkg.origin_price || 0)}
                                         </p>
                                     </div>
                                     <div className="text-right">
@@ -536,22 +588,7 @@ export default function TopUpPackageManagerPage() {
                             {/* Pricing Row */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-400 mb-2">Giá Bán (VND)</label>
-                                    <div className="relative">
-                                        <FiDollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
-                                        <input
-                                            type="number"
-                                            value={formData.price}
-                                            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                                            className="w-full bg-[#0F172A] border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-slate-200 focus:outline-none focus:border-blue-500 transition-colors font-mono"
-                                            placeholder="100000"
-                                            required
-                                            min="0"
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-400 mb-2">Giá Gốc (VND) - Tùy chọn</label>
+                                    <label className="block text-sm font-medium text-slate-400 mb-2">Giá Gốc (Giá nhập)</label>
                                     <div className="relative">
                                         <FiDollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
                                         <input
@@ -559,11 +596,81 @@ export default function TopUpPackageManagerPage() {
                                             value={formData.origin_price}
                                             onChange={(e) => setFormData({ ...formData, origin_price: e.target.value })}
                                             className="w-full bg-[#0F172A] border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-slate-200 focus:outline-none focus:border-blue-500 transition-colors font-mono"
-                                            placeholder="150000"
+                                            placeholder="100000"
+                                            min="0"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div className="hidden md:block"></div> {/* Spacer */}
+                            </div>
+
+                            {/* Auto Pricing Note */}
+                            {/* Profit Configuration */}
+                            <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5 space-y-4">
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Cấu hình Lợi nhuận riêng</label>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                                    <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
+                                        <div className="flex justify-between mb-2">
+                                            <label className="text-xs font-bold text-teal-400 uppercase">Lãi User (%)</label>
+                                            <span className="text-xs text-slate-500">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.ceil((parseInt(formData.origin_price || 0)) * (1 + (parseFloat(formData.profit_percent_user || 0) / 100))))}</span>
+                                        </div>
+                                        <input
+                                            type="number"
+                                            value={formData.profit_percent_user}
+                                            onChange={(e) => setFormData({ ...formData, profit_percent_user: e.target.value })}
+                                            className="w-full bg-[#0F172A] border border-slate-600 rounded-lg px-2 py-1.5 text-slate-200 text-sm focus:outline-none focus:border-teal-500 transition-colors text-center font-bold"
+                                            placeholder="0"
+                                            min="0"
+                                        />
+                                    </div>
+                                    <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
+                                        <div className="flex justify-between mb-2">
+                                            <label className="text-xs font-bold text-blue-400 uppercase">Lãi Basic (%)</label>
+                                            <span className="text-xs text-slate-500">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.ceil((parseInt(formData.origin_price || 0)) * (1 + (parseFloat(formData.profit_percent_basic || 0) / 100))))}</span>
+                                        </div>
+                                        <input
+                                            type="number"
+                                            value={formData.profit_percent_basic}
+                                            onChange={(e) => setFormData({ ...formData, profit_percent_basic: e.target.value })}
+                                            className="w-full bg-[#0F172A] border border-slate-600 rounded-lg px-2 py-1.5 text-slate-200 text-sm focus:outline-none focus:border-blue-500 transition-colors text-center font-bold"
+                                            placeholder="0"
+                                            min="0"
+                                        />
+                                    </div>
+
+                                    <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
+                                        <div className="flex justify-between mb-2">
+                                            <label className="text-xs font-bold text-purple-400 uppercase">Lãi Pro (%)</label>
+                                            <span className="text-xs text-slate-500">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.ceil((parseInt(formData.origin_price || 0)) * (1 + (parseFloat(formData.profit_percent_pro || 0) / 100))))}</span>
+                                        </div>
+                                        <input
+                                            type="number"
+                                            value={formData.profit_percent_pro}
+                                            onChange={(e) => setFormData({ ...formData, profit_percent_pro: e.target.value })}
+                                            className="w-full bg-[#0F172A] border border-slate-600 rounded-lg px-2 py-1.5 text-slate-200 text-sm focus:outline-none focus:border-purple-500 transition-colors text-center font-bold"
+                                            placeholder="0"
+                                            min="0"
+                                        />
+                                    </div>
+
+                                    <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
+                                        <div className="flex justify-between mb-2">
+                                            <label className="text-xs font-bold text-amber-400 uppercase">Lãi Plus (%)</label>
+                                            <span className="text-xs text-slate-500">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.ceil((parseInt(formData.origin_price || 0)) * (1 + (parseFloat(formData.profit_percent_plus || 0) / 100))))}</span>
+                                        </div>
+                                        <input
+                                            type="number"
+                                            value={formData.profit_percent_plus}
+                                            onChange={(e) => setFormData({ ...formData, profit_percent_plus: e.target.value })}
+                                            className="w-full bg-[#0F172A] border border-slate-600 rounded-lg px-2 py-1.5 text-slate-200 text-sm focus:outline-none focus:border-amber-500 transition-colors text-center font-bold"
+                                            placeholder="0"
                                             min="0"
                                         />
                                     </div>
                                 </div>
+                                <p className="text-[10px] text-slate-500 italic">*Mặc định hệ thống sẽ lấy theo cấu hình Game, bạn có thể nhập vào đây để ghi đè % lãi cho riêng gói này.</p>
                             </div>
 
                             {/* Configuration Toggles */}

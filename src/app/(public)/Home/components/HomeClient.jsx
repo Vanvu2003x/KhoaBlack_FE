@@ -80,7 +80,7 @@ export default function HomeClient({ initialGames }) {
     };
 
     return (
-        <section className="min-h-screen bg-[#0F172A] px-4 sm:px-6 md:px-8 lg:px-12 py-8 text-white bg-[url('/bg-grid.svg')] bg-fixed">
+        <section className="min-h-screen bg-[#0F172A] px-4 sm:px-6 md:px-8 lg:px-12 py-8 text-white">
             <div className="max-w-7xl mx-auto">
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* LEFT COLUMN: Main Content */}
