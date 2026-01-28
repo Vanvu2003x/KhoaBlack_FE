@@ -27,8 +27,8 @@ export default function Sidebar() {
 
         fetchData();
 
-        // Refresh every 30 seconds to keep data updated (real-time-ish)
-        const interval = setInterval(fetchData, 30000);
+        // Refresh every 1 hour (3600000 seconds) to reduce server load
+        const interval = setInterval(fetchData, 3600000);
 
         return () => clearInterval(interval);
     }, []);

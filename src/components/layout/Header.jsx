@@ -26,6 +26,8 @@ export default function Header() {
     const [openMobileMenu, setOpenMobileMenu] = useState(false);
 
     useEffect(() => {
+        let unsubscribeSocket = null;
+
         const fetchUserData = async () => {
             try {
                 const data = await getInfo();
@@ -38,9 +40,10 @@ export default function Header() {
                         localStorage.setItem("name", user.name);
 
                         const token = localStorage.getItem("token");
-                        connectSocket(token, (newBalance) => {
+                        const connection = connectSocket(token, (newBalance) => {
                             setBalance(newBalance);
                         });
+                        unsubscribeSocket = connection.unsubscribe;
                     }
                 }
             } catch (err) {
@@ -52,6 +55,13 @@ export default function Header() {
         };
 
         fetchUserData();
+
+        // Cleanup listener on unmount
+        return () => {
+            if (unsubscribeSocket) {
+                unsubscribeSocket();
+            }
+        };
     }, []);
 
     // I need to see what API returns. 
