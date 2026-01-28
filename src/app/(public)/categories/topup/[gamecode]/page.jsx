@@ -17,6 +17,11 @@ export async function generateMetadata(props) {
                     description: `Dịch vụ nạp game ${game.name} uy tín nhất.`,
                     images: [process.env.NEXT_PUBLIC_API_URL + game.thumbnail],
                 },
+                icons: {
+                    icon: process.env.NEXT_PUBLIC_API_URL + game.thumbnail,
+                    shortcut: process.env.NEXT_PUBLIC_API_URL + game.thumbnail,
+                    apple: process.env.NEXT_PUBLIC_API_URL + game.thumbnail,
+                },
             };
         }
     } catch (error) {

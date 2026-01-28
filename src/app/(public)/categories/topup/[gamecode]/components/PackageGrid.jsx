@@ -140,9 +140,10 @@ export default function PackageGrid({
                                                 src={baseURLAPI + pkg.thumbnail}
                                                 alt={pkg.package_name}
                                                 className="w-full h-full object-contain"
-                                                onError={(e) =>
-                                                    (e.target.src = "/placeholder.png")
-                                                }
+                                                onError={(e) => {
+                                                    e.target.onerror = null; // Prevent infinite loop
+                                                    e.target.src = "/imgs/image.png"; // Fallback to logo if placeholder missing
+                                                }}
                                             />
                                         </div>
                                     </div>
@@ -167,32 +168,17 @@ export default function PackageGrid({
 
                                         <div className="relative pb-1">
                                             {/* Original Price (Strikethrough) if discounted */}
-                                            {finalPrice < pkg.price && (
-                                                <div className="text-[10px] text-slate-400 font-medium line-through decoration-slate-400 absolute -top-3 left-1/2 -translate-x-1/2 w-full text-center">
-                                                    {new Intl.NumberFormat("vi-VN").format(pkg.price)} đ
-                                                </div>
+                                            {pkg.sale && pkg.origin_price > finalPrice && (
+                                                <span className="text-[10px] text-slate-400 line-through absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(pkg.origin_price)}
+                                                </span>
                                             )}
+                                            <p className={`text-sm md:text-base font-bold ${isHot ? "text-yellow-400" : "text-cyan-400"} drop-shadow-md`}>
+                                                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(finalPrice)}
+                                            </p>
 
-                                            <div
-                                                className={`text-xl font-black tracking-tighter drop-shadow-[0_0_10px_rgba(34,211,238,0.8)] ${isSelected
-                                                    ? "text-white"
-                                                    : isHot
-                                                        ? "text-rose-50"
-                                                        : "text-cyan-50"
-                                                    }`}
-                                            >
-                                                {new Intl.NumberFormat("vi-VN").format(
-                                                    finalPrice
-                                                )}
-                                            </div>
-                                            <div
-                                                className={`text-[9px] font-bold tracking-widest -mt-1 ${isHot
-                                                    ? "text-rose-400/80"
-                                                    : "text-cyan-400/80"
-                                                    }`}
-                                            >
-                                                VNĐ
-                                            </div>
+
+
                                         </div>
                                     </div>
                                 </div>

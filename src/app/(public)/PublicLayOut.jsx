@@ -79,18 +79,10 @@ export default function PublicLayout({ children }) {
 
             {/* Nút liên hệ */}
             <div className="fixed bottom-5 right-5 flex flex-col gap-4 z-40">
-                <a
-                    href="https://zalo.me/0866996056"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-16 h-16 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-125 animate-[pulse_2.5s_ease-in-out_infinite]"
-                    title="Liên hệ Zalo"
-                >
-                    <SiZalo className="text-white w-10 h-10" />
-                </a>
+
 
                 <a
-                    href="https://www.facebook.com/messages/t/802508256269336"
+                    href="https://www.facebook.com/profile.php?id=61586972106424"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-16 h-16 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-125 animate-[pulse_2.5s_ease-in-out_infinite]"

@@ -72,22 +72,7 @@ export default function OrderSummary({
                     </div>
 
                     {/* Total - Enhanced */}
-                    <div className="relative mb-6 p-5 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-blue-600/10 border border-cyan-400/30 overflow-hidden">
-                        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-5"></div>
-                        <div className="relative text-center">
-                            <div className="text-slate-400 text-xs mb-2 uppercase tracking-widest font-bold">
-                                Tổng thanh toán
-                            </div>
-                            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-cyan-200 to-blue-300 drop-shadow-[0_0_20px_rgba(34,211,238,0.6)] animate-pulse">
-                                {selectedPkg
-                                    ? new Intl.NumberFormat("vi-VN").format(selectedPkg.price)
-                                    : "0"}
-                                <span className="text-2xl text-slate-300 font-semibold ml-1.5">
-                                    đ
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+
 
                     {/* Button - Enhanced */}
                     <button
