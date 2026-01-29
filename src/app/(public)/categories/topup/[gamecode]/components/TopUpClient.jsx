@@ -59,6 +59,21 @@ export default function TopUpClient({ game, listPkg: initialListPkg }) {
         fetchUserLevel();
     }, []);
 
+    // Re-fetch packages when userLevel changes (to get correct display_price sorted from BE) or properly re-calculate
+    // Since BE returns Sorted List based on display_price, we SHOULD re-fetch to get correct order & price.
+    useEffect(() => {
+        if (userLevel > 1 && game?.gamecode) {
+            // setLoading(true); // Optional: avoid flash loading if desired, but safer to show loading
+            import("@/services/toup_package.service").then(({ getAllPackageByGameCode }) => {
+                getAllPackageByGameCode(game.gamecode)
+                    .then(data => {
+                        setListPkg(data || []);
+                    })
+                    .catch(err => console.error(err));
+            });
+        }
+    }, [userLevel, game?.gamecode]);
+
     // Handle initial loading if data not passed from server
     useEffect(() => {
         if (initialListPkg) {

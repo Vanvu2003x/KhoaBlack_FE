@@ -13,10 +13,19 @@ export default function PackageGrid({
     userLevel = 1
 }) {
     const calculatePrice = (pkg, level) => {
-        if (!level || level === 1) return pkg.price;
+        // Ưu tiên dùng display_price từ BE nếu có
+        if (pkg.display_price) return pkg.display_price;
+
+        // Fallback: tính theo level
+        if (!level || level === 1) return pkg.price_basic || pkg.price;
         if (level === 2) return pkg.price_pro || pkg.price; // Pro
         if (level === 3) return pkg.price_plus || pkg.price; // Plus/VIP
         return pkg.price;
+    };
+
+    const getOriginalPrice = (pkg) => {
+        // Giá basic để gạch khi có khuyến mại
+        return pkg.price_basic || pkg.price;
     };
 
     return (
@@ -36,7 +45,8 @@ export default function PackageGrid({
                     const isHot = pkg.sale; // Determine if it's a HOT package
 
                     const finalPrice = calculatePrice(pkg, userLevel);
-                    const originalPrice = pkg.price; // For reference if needed
+                    const originalPrice = getOriginalPrice(pkg);
+                    const hasDiscount = originalPrice > finalPrice; // Có khuyến mại khi giá gốc > giá cuối
 
                     return (
                         <div
@@ -167,10 +177,10 @@ export default function PackageGrid({
                                         ></div>
 
                                         <div className="relative pb-1">
-                                            {/* Original Price (Strikethrough) if discounted */}
-                                            {pkg.sale && pkg.origin_price > finalPrice && (
+                                            {/* Original Price (Strikethrough) if user has discount */}
+                                            {hasDiscount && (
                                                 <span className="text-[10px] text-slate-400 line-through absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(pkg.origin_price)}
+                                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(originalPrice)}
                                                 </span>
                                             )}
                                             <p className={`text-sm md:text-base font-bold ${isHot ? "text-yellow-400" : "text-cyan-400"} drop-shadow-md`}>

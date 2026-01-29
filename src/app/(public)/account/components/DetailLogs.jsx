@@ -45,6 +45,18 @@ export default function DetailLog() {
                 ) : (
                     orders.map((order) => {
                         const isExpanded = expandedOrderId === order.id;
+
+                        // Parse account_info if it's a string
+                        let accountInfo = order.account_info;
+                        if (typeof accountInfo === 'string') {
+                            try {
+                                accountInfo = JSON.parse(accountInfo);
+                            } catch (e) {
+                                accountInfo = {};
+                            }
+                        }
+                        accountInfo = accountInfo || {};
+
                         return (
                             <div
                                 key={order.id}
@@ -117,13 +129,13 @@ export default function DetailLog() {
                                                 </div>
                                                 <div className="flex justify-between items-center py-2 border-b border-white/5">
                                                     <span className="text-slate-400">Ngày tạo:</span>
-                                                    <span className="text-slate-200">{new Date(order.create_at).toLocaleString("vi-VN")}</span>
+                                                    <span className="text-slate-200">{new Date(order.create_at).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })}</span>
                                                 </div>
                                                 <div className="flex justify-between items-center py-2 border-b border-white/5">
                                                     <span className="text-slate-400">Cập nhật:</span>
                                                     <span className="text-slate-200">
                                                         {order.update_at ? (
-                                                            new Date(order.update_at).toLocaleString("vi-VN")
+                                                            new Date(order.update_at).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })
                                                         ) : (
                                                             <span className="text-slate-600 italic text-xs">Chưa cập nhật</span>
                                                         )}
@@ -131,11 +143,11 @@ export default function DetailLog() {
                                                 </div>
                                                 <div className="flex justify-between items-center py-2 border-b border-white/5">
                                                     <span className="text-slate-400">UID in-game:</span>
-                                                    <span className="font-mono text-slate-200 bg-slate-800 px-2 py-0.5 rounded">{order.account_info.uid || "N/A"}</span>
+                                                    <span className="font-mono text-slate-200 bg-slate-800 px-2 py-0.5 rounded">{accountInfo.uid || accountInfo.username || "N/A"}</span>
                                                 </div>
                                                 <div className="flex justify-between items-center py-2 border-b border-white/5">
                                                     <span className="text-slate-400">Server:</span>
-                                                    <span className="text-slate-200">{order.account_info.server?.trim() || "N/A"}</span>
+                                                    <span className="text-slate-200">{accountInfo.server?.trim() || accountInfo.id_server || "N/A"}</span>
                                                 </div>
                                             </div>
 
@@ -146,7 +158,7 @@ export default function DetailLog() {
                                                     <div>
                                                         <label className="text-slate-500 text-xs block mb-1">Tài khoản</label>
                                                         <div className="flex justify-between items-center bg-slate-900 rounded-lg px-3 py-2 border border-white/5">
-                                                            <span className="text-slate-200">{order.account_info.username}</span>
+                                                            <span className="text-slate-200">{accountInfo.username}</span>
                                                         </div>
                                                     </div>
 
@@ -155,7 +167,7 @@ export default function DetailLog() {
                                                         <div className="relative">
                                                             <input
                                                                 type={showPassword[order.id] ? "text" : "password"}
-                                                                value={order.account_info.password}
+                                                                value={accountInfo.password || ''}
                                                                 readOnly
                                                                 className="w-full bg-slate-900 text-slate-200 px-3 py-2 rounded-lg border border-white/5 focus:outline-none font-mono"
                                                             />

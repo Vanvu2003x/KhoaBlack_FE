@@ -331,7 +331,7 @@ export default function UserList() {
                                             user.level === 3 ? 'bg-red-500/10 text-red-500 border-red-500/20' :
                                                 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20'
                                             }`}>
-                                            {user.level === 2 ? "Pro" : user.level === 3 ? "Plus/VIP" : "Basic"}
+                                            {user.level === 2 ? "Pro" : user.level === 3 ? "VIP" : "Basic"}
                                         </span>
                                     </h3>
                                     <div className="text-slate-400 text-sm flex items-center gap-2 mt-1">

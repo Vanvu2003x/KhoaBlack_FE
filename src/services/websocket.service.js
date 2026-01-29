@@ -62,14 +62,11 @@ export const connectSocket = (token, onBalanceUpdate, onOrderUpdate) => {
     });
 
     socket.on("connect", () => {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log("✅ Socket connected successfully!");
-        console.log("   Socket ID:", socket.id);
-        console.log("   Transport:", socket.io.engine.transport.name);
-      }
+      console.log("✅ Socket connected! ID:", socket.id);
+      console.log("   Target URL:", URL);
+
       // Authenticate with token if provided
       if (token) {
-        console.log("🔐 Authenticating socket with token...");
         socket.emit("auth", token);
       }
     });
@@ -92,9 +89,7 @@ export const connectSocket = (token, onBalanceUpdate, onOrderUpdate) => {
     });
 
     socket.on("disconnect", (reason) => {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log("🔌 Socket disconnected:", reason);
-      }
+      console.log("🔌 Socket disconnected:", reason);
       if (reason === "io server disconnect") {
         // Server disconnected, try to reconnect
         socket.connect();
@@ -102,9 +97,7 @@ export const connectSocket = (token, onBalanceUpdate, onOrderUpdate) => {
     });
 
     socket.on("reconnect", (attemptNumber) => {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log("🔌 Socket reconnected after", attemptNumber, "attempts");
-      }
+      console.log("🔌 Socket reconnected after", attemptNumber, "attempts");
     });
 
     socket.on("reconnect_error", (error) => {
