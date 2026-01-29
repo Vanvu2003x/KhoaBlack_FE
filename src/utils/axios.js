@@ -21,6 +21,11 @@ api.interceptors.response.use(
 
       // Only redirect if we're in browser and not already on home
       if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+        // Check if we should skip redirect for this specific request
+        if (error.config?.skipRedirectOn401) {
+          return Promise.reject(error);
+        }
+
         // Optional: Show a message before redirect
         console.warn('🔒 Phiên đăng nhập hết hạn, vui lòng đăng nhập lại');
         window.location.href = '/';
