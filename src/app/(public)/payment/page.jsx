@@ -171,9 +171,11 @@ export default function ThanhToan() {
                                 <button onClick={cancelPayment} className="flex-1 py-3 rounded-xl border border-red-500/30 text-red-400 font-bold hover:bg-red-500/10 transition-all flex items-center justify-center gap-2">
                                     <FiX /> Hủy đơn hàng
                                 </button>
-                                <button onClick={() => window.location.reload()} className="flex-1 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-500 transition-all shadow-lg shadow-blue-500/25">
-                                    Tôi đã thanh toán
-                                </button>
+                            </div>
+                            <div className="mt-4 p-3 bg-green-500/10 border border-green-500/20 rounded-xl">
+                                <p className="text-center text-sm text-green-400 font-medium">
+                                    ⏳ Sau khi thanh toán, vui lòng giữ ở trang này 5-15 giây để được cộng tiền.
+                                </p>
                             </div>
                             <p className="text-center text-xs text-slate-500 mt-2">
                                 Hệ thống sẽ tự động xác nhận sau 1-3 phút.

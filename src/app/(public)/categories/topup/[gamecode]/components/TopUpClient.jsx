@@ -15,7 +15,8 @@ import { getInfo } from "@/services/auth.service";
 export default function TopUpClient({ game, listPkg: initialListPkg }) {
     const toast = useToast();
     const [listPkg, setListPkg] = useState(initialListPkg || []);
-    const [loading, setLoading] = useState(!initialListPkg);
+    // Show loading if SSR returned empty (might need client-side fetch) or no data passed
+    const [loading, setLoading] = useState(!initialListPkg || initialListPkg.length === 0);
     const [selectedPkg, setSelectedPkg] = useState(null);
     const [rechargeMethod, setRechargeMethod] = useState("uid"); // "uid" or "login"
     const [userLevel, setUserLevel] = useState(1); // Default to Basic (1)
@@ -39,11 +40,16 @@ export default function TopUpClient({ game, listPkg: initialListPkg }) {
         }
     }, [game]);
 
-    // Fetch User Level
+    // Fetch User Level - với timeout để không block UI khi có Cloudflare
     useEffect(() => {
         const fetchUserLevel = async () => {
             try {
-                const data = await getInfo();
+                // Tạo timeout để không chờ quá lâu
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Timeout')), 5000)
+                );
+
+                const data = await Promise.race([getInfo(), timeoutPromise]);
                 if (data && data.user) {
                     setUserLevel(data.user.level || 1);
                     setIsLoggedIn(true);
@@ -51,7 +57,8 @@ export default function TopUpClient({ game, listPkg: initialListPkg }) {
                     setIsLoggedIn(false);
                 }
             } catch (error) {
-                // If not logged in or error, default to 1
+                // Nếu lỗi (bao gồm timeout hoặc Cloudflare block), giữ nguyên packages từ SSR
+                console.log("Auth check skipped - using default packages");
                 setUserLevel(1);
                 setIsLoggedIn(false);
             }
@@ -61,22 +68,31 @@ export default function TopUpClient({ game, listPkg: initialListPkg }) {
 
     // Re-fetch packages when userLevel changes (to get correct display_price sorted from BE) or properly re-calculate
     // Since BE returns Sorted List based on display_price, we SHOULD re-fetch to get correct order & price.
+    // ALSO: Re-fetch if SSR returned empty (could be due to Cloudflare blocking server-side fetch)
     useEffect(() => {
-        if (userLevel > 1 && game?.gamecode) {
-            // setLoading(true); // Optional: avoid flash loading if desired, but safer to show loading
+        const shouldFetch = (userLevel > 1 || (initialListPkg && initialListPkg.length === 0)) && game?.gamecode;
+
+        if (shouldFetch) {
+            setLoading(true);
             import("@/services/toup_package.service").then(({ getAllPackageByGameCode }) => {
                 getAllPackageByGameCode(game.gamecode)
                     .then(data => {
-                        setListPkg(data || []);
+                        if (data && data.length > 0) {
+                            setListPkg(data);
+                        }
+                        setLoading(false);
                     })
-                    .catch(err => console.error(err));
+                    .catch(err => {
+                        console.error("Error fetching packages:", err);
+                        setLoading(false);
+                    });
             });
         }
-    }, [userLevel, game?.gamecode]);
+    }, [userLevel, game?.gamecode, initialListPkg]);
 
     // Handle initial loading if data not passed from server
     useEffect(() => {
-        if (initialListPkg) {
+        if (initialListPkg && initialListPkg.length > 0) {
             setLoading(false);
             setListPkg(initialListPkg);
         }
