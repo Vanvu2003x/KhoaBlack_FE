@@ -49,7 +49,7 @@ export default function ConfirmForm({ data, onClick }) {
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-slate-500 text-sm">Số tiền</span>
-                                <span className="text-green-400 font-bold">{data.package.price.toLocaleString()}đ</span>
+                                <span className="text-green-400 font-bold">{(data.package.price || 0).toLocaleString()}đ</span>
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-slate-500 text-sm">UID</span>
@@ -151,7 +151,7 @@ export default function ConfirmForm({ data, onClick }) {
                         <div className="ml-auto text-right">
                             <div className="text-xs text-slate-500 font-bold uppercase mb-0.5">Giá tiền</div>
                             <div className="text-green-400 font-bold text-lg">
-                                {data.package.price.toLocaleString()}đ
+                                {(data.package.price || 0).toLocaleString()}đ
                             </div>
                         </div>
                     </div>

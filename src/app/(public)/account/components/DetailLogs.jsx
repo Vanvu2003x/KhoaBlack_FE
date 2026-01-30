@@ -86,7 +86,7 @@ export default function DetailLog() {
 
                                     <div className="text-center md:text-left md:w-1/4">
                                         <div className="text-emerald-400 font-bold font-mono text-lg">
-                                            {order.amount.toLocaleString()}đ
+                                            {(order.amount || 0).toLocaleString()}đ
                                         </div>
                                     </div>
 

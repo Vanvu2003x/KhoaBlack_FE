@@ -91,7 +91,7 @@ export default function AccSellingLog() {
                                     {/* Price */}
                                     <div className="md:w-1/4 text-center md:text-left">
                                         <div className="text-emerald-400 font-bold font-mono text-lg">
-                                            {order.price.toLocaleString()}đ
+                                            {(order.price || 0).toLocaleString()}đ
                                         </div>
                                     </div>
 
