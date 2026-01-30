@@ -40,6 +40,10 @@ export default function AccountPage() {
 
     useEffect(() => {
         const fetchAllData = async () => {
+            if (!localStorage.getItem("name")) {
+                setLoading(false);
+                return;
+            }
             try {
                 // 1. Fetch User Info
                 const data = await getInfo();

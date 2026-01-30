@@ -28,7 +28,7 @@ export default function OrderSummary({
                     <div className="relative h-36 rounded-2xl overflow-hidden mb-6 border border-white/10 group/img shadow-lg shadow-cyan-500/10">
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/95 via-[#0f172a]/40 to-transparent z-10"></div>
                         <img
-                            src={game ? baseURLAPI + game.thumbnail : "/placeholder.png"}
+                            src={game ? baseURLAPI + game.thumbnail : "/imgs/image.png"}
                             className="w-full h-full object-cover transition-all duration-700 group-hover/img:scale-110 group-hover/img:brightness-110"
                             alt="Game Cover"
                         />

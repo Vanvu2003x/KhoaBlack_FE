@@ -165,7 +165,7 @@ export default function TopUpPackageManagerPage() {
                         <span class="font-bold text-purple-400">${formatMoney(pkg.price_pro || 0)}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-amber-400">Giá Plus:</span>
+                        <span className="text-amber-400">Giá VIP:</span>
                         <span class="font-bold text-amber-400">${formatMoney(pkg.price_plus || 0)}</span>
                     </div>
                     <div class="pt-2 border-t border-white/5 text-xs text-center italic text-slate-500">
@@ -470,7 +470,7 @@ export default function TopUpPackageManagerPage() {
                                     src={`${API_URL}${pkg.thumbnail}`}
                                     alt={pkg.package_name}
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    onError={(e) => { e.target.src = '/placeholder.png'; }} // Fallback
+                                    onError={(e) => { e.target.src = '/imgs/image.png'; }} // Fallback
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] to-transparent opacity-80"></div>
 
@@ -610,21 +610,7 @@ export default function TopUpPackageManagerPage() {
                             <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5 space-y-4">
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Cấu hình Lợi nhuận riêng</label>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                                    <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
-                                        <div className="flex justify-between mb-2">
-                                            <label className="text-xs font-bold text-teal-400 uppercase">Lãi User (%)</label>
-                                            <span className="text-xs text-slate-500">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.ceil((parseInt(formData.origin_price || 0)) * (1 + (parseFloat(formData.profit_percent_user || 0) / 100))))}</span>
-                                        </div>
-                                        <input
-                                            type="number"
-                                            value={formData.profit_percent_user}
-                                            onChange={(e) => setFormData({ ...formData, profit_percent_user: e.target.value })}
-                                            className="w-full bg-[#0F172A] border border-slate-600 rounded-lg px-2 py-1.5 text-slate-200 text-sm focus:outline-none focus:border-teal-500 transition-colors text-center font-bold"
-                                            placeholder="0"
-                                            min="0"
-                                        />
-                                    </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                     <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
                                         <div className="flex justify-between mb-2">
                                             <label className="text-xs font-bold text-blue-400 uppercase">Lãi Basic (%)</label>
@@ -657,7 +643,7 @@ export default function TopUpPackageManagerPage() {
 
                                     <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
                                         <div className="flex justify-between mb-2">
-                                            <label className="text-xs font-bold text-amber-400 uppercase">Lãi Plus (%)</label>
+                                            <label className="text-xs font-bold text-amber-400 uppercase">Lãi VIP (%)</label>
                                             <span className="text-xs text-slate-500">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.ceil((parseInt(formData.origin_price || 0)) * (1 + (parseFloat(formData.profit_percent_plus || 0) / 100))))}</span>
                                         </div>
                                         <input

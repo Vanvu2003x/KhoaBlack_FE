@@ -73,10 +73,10 @@ export default function ItemsPkg({ pkg }) {
                     <div className="flex-1 space-y-1">
                         <div className="font-bold text-black mb-2">{pkg.package_name}</div>
                         <div className="text-sm text-gray-400">
-                            Giá nạp: <span className="text-blue-600">{pkg.price.toLocaleString()}đ</span>
+                            Giá nạp: <span className="text-blue-600">{(pkg.price || 0).toLocaleString()}đ</span>
                         </div>
                         <div className="text-sm text-gray-400">
-                            Giá gốc: <span className="text-red-400">{pkg.origin_price.toLocaleString()}đ</span>
+                            Giá gốc: <span className="text-red-400">{(pkg.origin_price || 0).toLocaleString()}đ</span>
                         </div>
                         <div className="text-smmt-4 text-black">
                             Kiểu nạp: <span className="font-semibold">{pkg.package_type}</span>

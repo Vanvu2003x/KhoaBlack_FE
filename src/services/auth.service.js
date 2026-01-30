@@ -37,7 +37,7 @@ export const getRole = async () => {
 
 export const getInfo = async () => {
     try {
-        const res = await api.get("/api/users");
+        const res = await api.get("/api/users", { skipRedirectOn401: true });
         return res.data;
     } catch (error) {
         if (error.response && error.response.status === 401) {

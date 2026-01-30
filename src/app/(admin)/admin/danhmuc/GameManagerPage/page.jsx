@@ -423,7 +423,7 @@ export default function GameManagerPage() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-[10px] uppercase text-amber-400 mb-1">Lãi Plus (%)</label>
+                                        <label className="block text-[10px] uppercase text-amber-400 mb-1">Lãi VIP (%)</label>
                                         <input
                                             type="number"
                                             value={formData.profit_percent_plus}

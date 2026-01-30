@@ -29,6 +29,7 @@ export default function Header() {
         let unsubscribeSocket = null;
 
         const fetchUserData = async () => {
+            if (!localStorage.getItem("name")) return;
             try {
                 const data = await getInfo();
                 console.log("UserInfo:", data);

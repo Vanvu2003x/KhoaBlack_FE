@@ -69,7 +69,7 @@ export default function WalletLog() {
                                 >
                                     <td className="py-4 px-4 font-mono text-slate-400 font-medium">#{log.id}</td>
                                     <td className="py-4 px-4 text-emerald-400 font-bold font-mono">
-                                        {log.amount.toLocaleString()}đ
+                                        {(log.amount || 0).toLocaleString()}đ
                                     </td>
                                     <td className="py-4 px-4 text-center">
                                         <span
