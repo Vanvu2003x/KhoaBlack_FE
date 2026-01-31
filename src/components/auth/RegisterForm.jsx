@@ -44,7 +44,7 @@ export default function RegisterForm({ onClose, onSwitch }) {
             toast.success("Đăng ký thành công!");
             window.location.reload();
         } catch (error) {
-            toast.error(error.response?.data?.message);
+            toast.error(error.response?.data?.message || "Đăng ký thất bại");
         } finally {
             setIsLoading(false);
         }

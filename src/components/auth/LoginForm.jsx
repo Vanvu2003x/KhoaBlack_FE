@@ -29,7 +29,7 @@ export default function LoginForm({ onClose, onSwitch }) {
             toast.success("Đăng nhập thành công");
             window.location.reload();
         } catch (error) {
-            toast.error("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
+            toast.error(error.response?.data?.message || "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
         } finally {
             setIsLoading(false);
         }
