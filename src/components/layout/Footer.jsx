@@ -27,7 +27,8 @@ export default function Footer() {
                     <h3 className="text-white text-lg font-bold mb-6 border-b border-gray-700 pb-2 inline-block">LIÊN HỆ HỖ TRỢ</h3>
                     <ul className="space-y-4">
                         <li>
-                            <Link href="https://www.facebook.com/Napgameuytin2111/" className="flex items-center gap-3 hover:text-blue-500 transition-all duration-200 group">
+                            <Link
+                                href="https://www.facebook.com/profile.php?id=61586972106424" className="flex items-center gap-3 hover:text-blue-500 transition-all duration-200 group">
                                 <span className="p-2 bg-gray-800 rounded-full group-hover:bg-blue-900/30 transition-colors"><FaFacebook className="text-lg" /></span>
                                 <span className="font-medium">Facebook Fanpage</span>
                             </Link>
@@ -59,7 +60,7 @@ export default function Footer() {
                     </div>
                     <div className="flex gap-5 text-xl">
                         <Link href="https://github.com/Vanvu2003x" className="text-gray-500 hover:text-white hover:scale-110 transition-all duration-200"><FaGithub /></Link>
-                        <Link href="https://www.facebook.com/van.vu.488317" className="text-gray-500 hover:text-blue-500 hover:scale-110 transition-all duration-200"><FaFacebook /></Link>
+                        <a href="https://www.facebook.com/profile.php?id=61586972106424" target="_blank" className="text-gray-500 hover:text-blue-500 hover:scale-110 transition-all duration-200"><FaFacebook /></a>
                     </div>
                 </div>
             </div>

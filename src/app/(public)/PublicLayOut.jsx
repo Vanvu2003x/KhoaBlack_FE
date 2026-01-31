@@ -2,6 +2,7 @@
 
 import { BsMessenger } from "react-icons/bs"
 import { SiZalo } from "react-icons/si"
+import { FaFacebook } from "react-icons/fa"
 import Footer from "@/components/layout/Footer"
 import Header from "@/components/layout/Header"
 import { useEffect, useState } from "react"
@@ -83,6 +84,16 @@ export default function PublicLayout({ children }) {
 
                 <a
                     href="https://www.facebook.com/profile.php?id=61586972106424"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-16 h-16 bg-blue-700 hover:bg-blue-800 rounded-full flex items-center justify-center shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-125 animate-[pulse_2.5s_ease-in-out_infinite]"
+                    title="Facebook Fanpage"
+                >
+                    <FaFacebook className="text-white w-10 h-10" />
+                </a>
+
+                <a
+                    href="https://m.me/939588092574339"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-16 h-16 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-125 animate-[pulse_2.5s_ease-in-out_infinite]"

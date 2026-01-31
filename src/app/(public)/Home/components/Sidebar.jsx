@@ -157,7 +157,7 @@ export default function Sidebar() {
                 </div>
                 <h3 className="text-white font-bold text-lg mb-2">Cần hỗ trợ?</h3>
                 <p className="text-indigo-100 text-xs mb-6 px-4">Đội ngũ hỗ trợ trực tuyến 24/7 sẵn sàng giúp đỡ bạn.</p>
-                <a href="https://www.facebook.com/Napgameuytin2111/" target="_blank" className="block w-full py-3 bg-white text-indigo-600 font-bold rounded-full hover:bg-gray-100 transition-colors text-sm">
+                <a href="https://www.facebook.com/profile.php?id=61586972106424" target="_blank" className="block w-full py-3 bg-white text-indigo-600 font-bold rounded-full hover:bg-gray-100 transition-colors text-sm">
                     Liên hệ hỗ trợ
                 </a>
             </div>
