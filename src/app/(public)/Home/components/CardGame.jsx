@@ -30,7 +30,7 @@ export default function CardGame({ game, type, onClick }) {
         >
             {/* Background Image */}
             <img
-                src={urlBaseAPI + game.thumbnail}
+                src={game.thumbnail?.startsWith('http') ? game.thumbnail : urlBaseAPI + game.thumbnail}
                 alt={game.name}
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             />

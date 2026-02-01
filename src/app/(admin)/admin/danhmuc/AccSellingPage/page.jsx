@@ -40,7 +40,7 @@ const AccOrderCard = ({ order, onSendAcc, onCancel, onViewImage }) => {
                     <div className="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 rounded-xl overflow-hidden border border-white/10 bg-slate-900 relative group/img shadow-lg">
                         {order.game_thumbnail ? (
                             <img
-                                src={`${apiBaseUrl}${order.game_thumbnail}`}
+                                src={order.game_thumbnail?.startsWith('http') ? order.game_thumbnail : `${apiBaseUrl}${order.game_thumbnail}`}
                                 alt="Game"
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110"
                             />
@@ -108,7 +108,7 @@ const AccOrderCard = ({ order, onSendAcc, onCancel, onViewImage }) => {
                             <div className="text-right">
                                 {order.acc_image && (
                                     <button
-                                        onClick={() => onViewImage(`${apiBaseUrl}/uploads/${order.acc_image}`)}
+                                        onClick={() => onViewImage(order.acc_image?.startsWith('http') ? order.acc_image : `${apiBaseUrl}/uploads/${order.acc_image}`)}
                                         className="text-xs font-bold text-slate-400 hover:text-teal-400 flex items-center gap-1 ml-auto transition-colors"
                                     >
                                         <FiImage /> Xem ảnh

@@ -56,7 +56,7 @@ export default function ItemsPkg({ pkg }) {
                     {/* Ảnh thumbnail */}
                     <div className="relative w-24 h-24">
                         <img
-                            src={`${apiBaseUrl}${pkg.thumbnail}`}
+                            src={pkg.thumbnail?.startsWith('http') ? pkg.thumbnail : `${apiBaseUrl}${pkg.thumbnail}`}
                             alt={pkg.package_name}
                             className="w-24 h-24 object-cover"
                         />

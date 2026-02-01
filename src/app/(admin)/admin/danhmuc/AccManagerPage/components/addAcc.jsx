@@ -35,7 +35,7 @@ export default function AccForm({ gameList, selectedGame, onSuccess, onClose, ed
             // Set preview to existing image
             if (accData.image) {
                 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL
-                setPreview(`${apiBaseUrl}/uploads/${accData.image}`)
+                setPreview(accData.image?.startsWith('http') ? accData.image : `${apiBaseUrl}/uploads/${accData.image}`)
             }
         } else if (selectedGame) {
             setFormData(prev => ({ ...prev, game_id: selectedGame.id }))
@@ -53,7 +53,7 @@ export default function AccForm({ gameList, selectedGame, onSuccess, onClose, ed
             // If editing and no new file, keep existing preview
             if (editMode && accData?.image) {
                 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL
-                setPreview(`${apiBaseUrl}/uploads/${accData.image}`)
+                setPreview(accData.image?.startsWith('http') ? accData.image : `${apiBaseUrl}/uploads/${accData.image}`)
             } else {
                 setPreview(null)
             }

@@ -73,7 +73,7 @@ export default function DetailLog() {
                                         <div className="relative">
                                             <div className="absolute inset-0 bg-gradient-to-tr from-orange-500/20 to-red-500/20 rounded-lg"></div>
                                             <img
-                                                src={process.env.NEXT_PUBLIC_API_URL + order.thumbnail}
+                                                src={order.thumbnail?.startsWith('http') ? order.thumbnail : process.env.NEXT_PUBLIC_API_URL + order.thumbnail}
                                                 alt={order.package_name}
                                                 className="w-12 h-12 rounded-lg object-cover border border-white/5"
                                             />

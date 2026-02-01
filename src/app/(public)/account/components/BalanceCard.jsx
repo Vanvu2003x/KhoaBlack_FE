@@ -4,9 +4,25 @@ import { useRouter } from "next/navigation";
 import { FaWallet, FaPlusCircle, FaChevronDown } from "react-icons/fa";
 import { useState } from "react";
 
-export default function BalanceCard({ balance, onDeposit }) {
+export default function BalanceCard({ balance, userLevel, onDeposit }) {
     const router = useRouter();
     const [isExpanded, setIsExpanded] = useState(false);
+
+    // Helper function to get member level label and color
+    const getMemberLabel = (level) => {
+        switch (level) {
+            case 1:
+                return { label: "Basic Member", color: "text-slate-200" };
+            case 2:
+                return { label: "Pro Member", color: "text-blue-200" };
+            case 3:
+                return { label: "VIP Member", color: "text-amber-200" };
+            default:
+                return { label: "Member", color: "text-indigo-200" };
+        }
+    };
+
+    const memberInfo = getMemberLabel(userLevel);
 
     return (
         <div className="h-full bg-gradient-to-br from-indigo-600 to-violet-700 rounded-3xl text-white relative overflow-hidden shadow-2xl">
@@ -89,7 +105,7 @@ export default function BalanceCard({ balance, onDeposit }) {
                         <div className="w-10 h-8 rounded border border-white/30 bg-gradient-to-br from-yellow-200/50 to-yellow-600/50 backdrop-blur-md flex items-center justify-center">
                             <div className="w-full h-[1px] bg-white/40"></div>
                         </div>
-                        <div className="text-xs text-indigo-200 tracking-[0.2em] uppercase">Platinum Member</div>
+                        <div className={`text-xs ${memberInfo.color} tracking-[0.2em] uppercase`}>{memberInfo.label}</div>
                     </div>
 
                     {/* Action Buttons */}

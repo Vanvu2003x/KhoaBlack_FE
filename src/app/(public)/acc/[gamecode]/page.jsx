@@ -30,7 +30,7 @@ export async function generateMetadata({ params }) {
                     description: `Shop bán acc ${game.name} uy tín nhất. Giá rẻ, bảo hành, giao dịch tự động.`,
                     images: [
                         {
-                            url: process.env.NEXT_PUBLIC_API_URL + game.thumbnail,
+                            url: game.thumbnail?.startsWith('http') ? game.thumbnail : process.env.NEXT_PUBLIC_API_URL + game.thumbnail,
                             width: 800,
                             height: 600,
                             alt: `Acc ${game.name}`,
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }) {
                     card: "summary_large_image",
                     title: `Mua Nick ${game.name}`,
                     description: `Shop acc ${game.name} uy tín, giá rẻ.`,
-                    images: [process.env.NEXT_PUBLIC_API_URL + game.thumbnail],
+                    images: [game.thumbnail?.startsWith('http') ? game.thumbnail : process.env.NEXT_PUBLIC_API_URL + game.thumbnail],
                 },
                 alternates: {
                     canonical: `${baseUrl}/acc/${gamecode}`,

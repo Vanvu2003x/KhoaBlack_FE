@@ -45,7 +45,7 @@ export default function AccItem({ acc, onDelete, onEdit }) {
                 <div className="relative aspect-[16/9] overflow-hidden bg-slate-950">
                     {acc.image ? (
                         <img
-                            src={`${apiBaseUrl}/uploads/${acc.image}`}
+                            src={acc.image?.startsWith('http') ? acc.image : `${apiBaseUrl}/uploads/${acc.image}`}
                             alt={`Acc #${acc.id}`}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
@@ -143,7 +143,7 @@ export default function AccItem({ acc, onDelete, onEdit }) {
                     onClick={() => setShowModal(false)}
                 >
                     <img
-                        src={`${apiBaseUrl}/uploads/${acc.image}`}
+                        src={acc.image?.startsWith('http') ? acc.image : `${apiBaseUrl}/uploads/${acc.image}`}
                         alt="acc full"
                         className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl animate-[scaleIn_0.3s_cubic-bezier(0.16,1,0.3,1)]"
                         onClick={(e) => e.stopPropagation()}

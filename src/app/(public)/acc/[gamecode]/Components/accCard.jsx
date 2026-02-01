@@ -88,7 +88,7 @@ export default function AccCardItem({ acc, userLevel, onBuySuccess }) {
                         <Link href={`/acc/detail/${acc.id}`}>
                             <div className="w-full h-full cursor-pointer group/img">
                                 <img
-                                    src={`${apiBaseUrl}/uploads/${acc.image}`}
+                                    src={acc.image?.startsWith('http') ? acc.image : `${apiBaseUrl}/uploads/${acc.image}`}
                                     alt="acc"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
@@ -173,7 +173,7 @@ export default function AccCardItem({ acc, userLevel, onBuySuccess }) {
                         <FiX size={24} />
                     </button>
                     <img
-                        src={`${apiBaseUrl}/uploads/${acc.image}`}
+                        src={acc.image?.startsWith('http') ? acc.image : `${apiBaseUrl}/uploads/${acc.image}`}
                         alt="Full acc"
                         className="max-h-[90vh] max-w-[90vw] object-contain rounded-2xl shadow-2xl animate-[scaleIn_0.3s_ease-out]"
                         onClick={(e) => e.stopPropagation()}

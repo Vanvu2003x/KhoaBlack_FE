@@ -147,7 +147,7 @@ export default function PackageGrid({
                                         ></div>
                                         <div className="w-16 h-16 relative drop-shadow-[0_0_10px_rgba(34,211,238,0.6)] transition-transform duration-300 group-hover:scale-110">
                                             <img
-                                                src={baseURLAPI + pkg.thumbnail}
+                                                src={pkg.thumbnail?.startsWith('http') ? pkg.thumbnail : baseURLAPI + pkg.thumbnail}
                                                 alt={pkg.package_name}
                                                 className="w-full h-full object-contain"
                                                 onError={(e) => {

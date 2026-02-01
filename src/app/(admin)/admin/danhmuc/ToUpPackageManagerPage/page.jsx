@@ -213,14 +213,22 @@ export default function TopUpPackageManagerPage() {
 
     const handleOpenEdit = (pkg) => {
         setCurrentPackage(pkg);
+
+        // Fallback to game config if package profit percentages are 0/null/undefined
+        const getPercentValue = (pkgValue, gameValue) => {
+            // If package has a non-zero value, use it; otherwise use game config
+            return (pkgValue !== null && pkgValue !== undefined && pkgValue !== 0)
+                ? pkgValue
+                : (gameValue || 0);
+        };
+
         setFormData({
             package_name: pkg.package_name,
             origin_price: pkg.origin_price || "",
-            // Use package's own percentages if set (or 0), loop back to game if desired? 
-            // DB stores 0 usually. Let's use what is in pkg.
-            profit_percent_basic: pkg.profit_percent_basic,
-            profit_percent_pro: pkg.profit_percent_pro,
-            profit_percent_plus: pkg.profit_percent_plus,
+            // Fallback to game config if package values are 0/null
+            profit_percent_basic: getPercentValue(pkg.profit_percent_basic, selectedGame?.profit_percent_basic),
+            profit_percent_pro: getPercentValue(pkg.profit_percent_pro, selectedGame?.profit_percent_pro),
+            profit_percent_plus: getPercentValue(pkg.profit_percent_plus, selectedGame?.profit_percent_plus),
             profit_percent_user: pkg.profit_percent_user || 0,
             package_type: pkg.package_type || "default",
             status: pkg.status || "active",
@@ -229,7 +237,7 @@ export default function TopUpPackageManagerPage() {
             fileAPI: pkg.fileAPI ? JSON.stringify(pkg.fileAPI, null, 2) : "",
         });
         // Assuming 'thumbnail' field is a path string
-        setPreviewImg(pkg.thumbnail ? `${API_URL}${pkg.thumbnail}` : null);
+        setPreviewImg(pkg.thumbnail ? (pkg.thumbnail.startsWith('http') ? pkg.thumbnail : `${API_URL}${pkg.thumbnail}`) : null);
         setIsModalOpen(true);
     };
 
@@ -342,7 +350,7 @@ export default function TopUpPackageManagerPage() {
                                     {selectedGame ? (
                                         <div className="flex items-center gap-2">
                                             <img
-                                                src={`${API_URL}${selectedGame.thumbnail}`}
+                                                src={selectedGame.thumbnail?.startsWith('http') ? selectedGame.thumbnail : `${API_URL}${selectedGame.thumbnail}`}
                                                 alt=""
                                                 className="w-5 h-5 rounded object-cover"
                                             />
@@ -375,7 +383,7 @@ export default function TopUpPackageManagerPage() {
                                                     <>
                                                         <span className={`flex items-center gap-2 truncate ${selected ? 'font-medium text-blue-400' : 'font-normal'}`}>
                                                             <img
-                                                                src={`${API_URL}${game.thumbnail}`}
+                                                                src={game.thumbnail?.startsWith('http') ? game.thumbnail : `${API_URL}${game.thumbnail}`}
                                                                 alt=""
                                                                 className="w-5 h-5 rounded object-cover"
                                                             />
@@ -467,7 +475,7 @@ export default function TopUpPackageManagerPage() {
                             {/* Image Area with Actions */}
                             <div className="relative aspect-[16/9] overflow-hidden bg-slate-900/50">
                                 <img
-                                    src={`${API_URL}${pkg.thumbnail}`}
+                                    src={pkg.thumbnail?.startsWith('http') ? pkg.thumbnail : `${API_URL}${pkg.thumbnail}`}
                                     alt={pkg.package_name}
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                     onError={(e) => { e.target.src = '/imgs/image.png'; }} // Fallback

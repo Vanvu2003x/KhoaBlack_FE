@@ -190,6 +190,7 @@ export default function AccountPage() {
                             <div className="xl:col-span-1">
                                 <BalanceCard
                                     balance={user.balance}
+                                    userLevel={user.level}
                                     onDeposit={() => setOpenNap(true)}
                                 />
                             </div>

@@ -258,8 +258,8 @@ export default function TopUpClient({ game, listPkg: initialListPkg }) {
                 {/* Footer simple (Optional) */}
                 <div className="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
                     <div className="flex items-center gap-2 text-white font-bold">
-                        <FaGamepad className="text-purple-500" size={24} /> Gaming
-                        Shop
+                        <FaGamepad className="text-purple-500" size={24} />
+                        {game?.name || "Gaming Shop"}
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="bg-white p-1 rounded h-6 w-10"></div>

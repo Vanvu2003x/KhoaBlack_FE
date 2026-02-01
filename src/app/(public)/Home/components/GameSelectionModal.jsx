@@ -36,7 +36,7 @@ export default function GameSelectionModal({ game, isOpen, onClose }) {
                 {/* Header */}
                 <div className="relative h-48 sm:h-64">
                     <img
-                        src={game?.thumbnail ? `${process.env.NEXT_PUBLIC_API_URL}${game.thumbnail}` : '/placeholder.jpg'}
+                        src={game?.thumbnail?.startsWith('http') ? game.thumbnail : (game?.thumbnail ? `${process.env.NEXT_PUBLIC_API_URL}${game.thumbnail}` : '/placeholder.jpg')}
                         alt={game?.name}
                         className="w-full h-full object-cover"
                     />

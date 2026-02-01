@@ -74,10 +74,10 @@ export default function AccSellingLog() {
                                 <div className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                     {/* Game Info */}
                                     <div className="flex items-center gap-4 md:w-1/3">
-                                        <div className="relative group cursor-pointer" onClick={() => setLightboxImg(process.env.NEXT_PUBLIC_API_URL + order.game_thumbnail)}>
+                                        <div className="relative group cursor-pointer" onClick={() => setLightboxImg(order.game_thumbnail?.startsWith('http') ? order.game_thumbnail : process.env.NEXT_PUBLIC_API_URL + order.game_thumbnail)}>
                                             <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-all rounded-lg"></div>
                                             <img
-                                                src={process.env.NEXT_PUBLIC_API_URL + order.game_thumbnail}
+                                                src={order.game_thumbnail?.startsWith('http') ? order.game_thumbnail : process.env.NEXT_PUBLIC_API_URL + order.game_thumbnail}
                                                 alt="Game"
                                                 className="w-14 h-14 object-cover rounded-lg border border-white/10 shadow-sm"
                                             />
@@ -195,11 +195,11 @@ export default function AccSellingLog() {
 
                                         <div className="mt-5">
                                             <button
-                                                onClick={() => setLightboxImg(process.env.NEXT_PUBLIC_API_URL + "/uploads/" + order.acc_image)}
+                                                onClick={() => setLightboxImg(order.acc_image?.startsWith('http') ? order.acc_image : process.env.NEXT_PUBLIC_API_URL + "/uploads/" + order.acc_image)}
                                                 className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors bg-black/20 px-4 py-3 rounded-xl w-full border border-white/5 hover:border-white/20"
                                             >
                                                 <img
-                                                    src={process.env.NEXT_PUBLIC_API_URL + "/uploads/" + order.acc_image}
+                                                    src={order.acc_image?.startsWith('http') ? order.acc_image : process.env.NEXT_PUBLIC_API_URL + "/uploads/" + order.acc_image}
                                                     className="w-8 h-8 rounded object-cover"
                                                     alt="Detail"
                                                 />

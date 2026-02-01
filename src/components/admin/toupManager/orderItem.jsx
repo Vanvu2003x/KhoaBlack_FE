@@ -111,7 +111,7 @@ export default function OrderItem({ order, onStatusChange }) {
                     <div className="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 rounded-xl overflow-hidden border border-white/10 bg-slate-900 relative group/img shadow-lg">
                         {order.thumbnail ? (
                             <img
-                                src={urlBaseAPI + order.thumbnail}
+                                src={order.thumbnail?.startsWith('http') ? order.thumbnail : urlBaseAPI + order.thumbnail}
                                 alt="Package"
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110"
                             />

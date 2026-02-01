@@ -166,7 +166,7 @@ export default function AccManagerPage() {
                                             {selectedGame ? (
                                                 <div className="flex items-center gap-3">
                                                     <img
-                                                        src={`${apiBaseUrl}${selectedGame?.thumbnail}`}
+                                                        src={selectedGame?.thumbnail?.startsWith('http') ? selectedGame.thumbnail : `${apiBaseUrl}${selectedGame?.thumbnail}`}
                                                         className="w-6 h-6 rounded-md object-cover ring-2 ring-slate-700 group-hover:ring-slate-600"
                                                         alt={selectedGame?.name}
                                                     />
@@ -196,7 +196,7 @@ export default function AccManagerPage() {
                                                         {({ selected }) => (
                                                             <div className="flex items-center gap-3">
                                                                 <img
-                                                                    src={`${apiBaseUrl}${game.thumbnail}`}
+                                                                    src={game.thumbnail?.startsWith('http') ? game.thumbnail : `${apiBaseUrl}${game.thumbnail}`}
                                                                     className={`w-8 h-8 rounded-lg object-cover ${selected ? 'ring-2 ring-purple-500' : ''}`}
                                                                     alt={game.name}
                                                                 />

@@ -143,7 +143,7 @@ export default function AccDetailPage() {
                             {/* Main Image */}
                             <div className="relative mb-4 rounded-xl overflow-hidden group">
                                 <img
-                                    src={`${apiBaseUrl}/uploads/${images[selectedImage]}`}
+                                    src={images[selectedImage]?.startsWith('http') ? images[selectedImage] : `${apiBaseUrl}/uploads/${images[selectedImage]}`}
                                     alt="Account"
                                     className="w-full h-[400px] object-cover"
                                 />
@@ -162,7 +162,7 @@ export default function AccDetailPage() {
                                                 }`}
                                         >
                                             <img
-                                                src={`${apiBaseUrl}/uploads/${img}`}
+                                                src={img?.startsWith('http') ? img : `${apiBaseUrl}/uploads/${img}`}
                                                 alt={`Thumbnail ${idx + 1}`}
                                                 className="w-full h-20 object-cover"
                                             />

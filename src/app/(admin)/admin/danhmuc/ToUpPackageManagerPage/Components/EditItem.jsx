@@ -16,7 +16,7 @@ export default function EditPkg({ pkg, onCancel }) {
     })
 
     const [imageFile, setImageFile] = useState(null)
-    const [imagePreview, setImagePreview] = useState(`${apiBaseUrl}${pkg.thumbnail}`)
+    const [imagePreview, setImagePreview] = useState(pkg.thumbnail?.startsWith('http') ? pkg.thumbnail : `${apiBaseUrl}${pkg.thumbnail}`)
     const [loading, setLoading] = useState(false)
     const inputFileRef = useRef(null)
 

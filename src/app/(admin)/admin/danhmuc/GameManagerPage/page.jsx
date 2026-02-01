@@ -118,7 +118,7 @@ export default function GameManagerPage() {
             profit_percent_plus: game.profit_percent_plus || 0,
             origin_markup_percent: game.origin_markup_percent || 0,
         });
-        setPreviewImg(process.env.NEXT_PUBLIC_API_URL + game.thumbnail);
+        setPreviewImg(game.thumbnail?.startsWith('http') ? game.thumbnail : process.env.NEXT_PUBLIC_API_URL + game.thumbnail);
         setThumbnailFile(null);
         setIsModalOpen(true);
     };
@@ -279,7 +279,7 @@ export default function GameManagerPage() {
                         >
                             <div className="relative aspect-[16/9] overflow-hidden">
                                 <img
-                                    src={process.env.NEXT_PUBLIC_API_URL + game.thumbnail}
+                                    src={game.thumbnail?.startsWith('http') ? game.thumbnail : process.env.NEXT_PUBLIC_API_URL + game.thumbnail}
                                     alt={game.name}
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                 />

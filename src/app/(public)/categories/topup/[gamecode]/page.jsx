@@ -15,12 +15,12 @@ export async function generateMetadata(props) {
                 openGraph: {
                     title: `Nạp game ${game.name}`,
                     description: `Dịch vụ nạp game ${game.name} uy tín nhất.`,
-                    images: [process.env.NEXT_PUBLIC_API_URL + game.thumbnail],
+                    images: [game.thumbnail?.startsWith('http') ? game.thumbnail : process.env.NEXT_PUBLIC_API_URL + game.thumbnail],
                 },
                 icons: {
-                    icon: process.env.NEXT_PUBLIC_API_URL + game.thumbnail,
-                    shortcut: process.env.NEXT_PUBLIC_API_URL + game.thumbnail,
-                    apple: process.env.NEXT_PUBLIC_API_URL + game.thumbnail,
+                    icon: game.thumbnail?.startsWith('http') ? game.thumbnail : process.env.NEXT_PUBLIC_API_URL + game.thumbnail,
+                    shortcut: game.thumbnail?.startsWith('http') ? game.thumbnail : process.env.NEXT_PUBLIC_API_URL + game.thumbnail,
+                    apple: game.thumbnail?.startsWith('http') ? game.thumbnail : process.env.NEXT_PUBLIC_API_URL + game.thumbnail,
                 },
             };
         }
