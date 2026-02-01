@@ -204,6 +204,11 @@ export default function ThanhToan() {
                                     </div>
                                 </div>
 
+                                <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3 text-red-400 text-sm">
+                                    <FiAlertTriangle className="shrink-0 text-xl mt-0.5" />
+                                    <p>Hiện ngân hàng VCB đang lỗi chưa được hỗ trợ. Vui lòng chọn ngân hàng khác hoặc liên hệ admin để được hỗ trợ. Xin lỗi vì sự bất tiện này.</p>
+                                </div>
+
                                 {/* Bank Info Details with Copy buttons */}
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between p-4 bg-[#090514]/50 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
