@@ -1,0 +1,172 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  
+  /* Sidebar Colors */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Chart Colors */
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+
+  /* Standard Colors */
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  /* Radius */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* NEXUS PAY - DARK GAMING THEME DEFAULT */
+:root {
+  --radius: 0.75rem;
+
+  /* Deep Space Blue Background */
+  --background: #0F172A; 
+  --foreground: #F8FAFC;
+
+  /* Glass/Card Backgrounds */
+  --card: #1E293B; /* Slate 800 */
+  --card-foreground: #F8FAFC;
+  
+  --popover: #1E293B;
+  --popover-foreground: #F8FAFC;
+
+  /* Primary: Electric Indigo/Purple */
+  --primary: #6366F1; /* Indigo 500 */
+  --primary-foreground: #FFFFFF;
+
+  /* Secondary: Darker Slate */
+  --secondary: #334155;
+  --secondary-foreground: #F8FAFC;
+
+  /* Muted Text */
+  --muted: #334155;
+  --muted-foreground: #94A3B8;
+
+  /* Accent: Glowy Purple */
+  --accent: #4F46E5;
+  --accent-foreground: #FFFFFF;
+
+  /* Destructive */
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+
+  /* Borders: Subtle Slate */
+  --border: #334155;
+  --input: #334155;
+  --ring: #6366F1;
+
+  /* Chart Colors (Bright) */
+  --chart-1: #6366F1;
+  --chart-2: #8B5CF6;
+  --chart-3: #EC4899;
+  --chart-4: #10B981;
+  --chart-5: #F59E0B;
+
+  /* Sidebar */
+  --sidebar: #1E293B;
+  --sidebar-foreground: #F8FAFC;
+  --sidebar-primary: #6366F1;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #334155;
+  --sidebar-accent-foreground: #F8FAFC;
+  --sidebar-border: #334155;
+  --sidebar-ring: #6366F1;
+}
+
+/* Force Dark Mode styles if .dark class is used, but :root is already dark now */
+.dark {
+  --background: #020617; /* Even darker */
+  --foreground: #F8FAFC;
+  /* (Keep same as root mostly) */
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-[var(--background)] text-[var(--foreground)];
+    font-family: 'Outfit', 'Segoe UI', system-ui, sans-serif;
+  }
+  
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar {
+      width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+      background: #0F172A; 
+  }
+  ::-webkit-scrollbar-thumb {
+      background: #334155; 
+      border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+      background: #475569; 
+  }
+  
+  /* Custom scrollbar for widgets */
+  .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+  }
+}
+
+/* Utility Animations */
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.8); }
+}
+.animate-glow {
+  animation: glow 2s infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
