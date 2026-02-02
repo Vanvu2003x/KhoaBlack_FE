@@ -8,9 +8,14 @@ const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL
 export default function ItemsPkg({ pkg }) {
     const [status, setStatus] = useState(pkg.status)
     const [isEdit, setIsEdit] = useState(false)
+    const [statusLoading, setStatusLoading] = useState(false)
+    const [deleteLoading, setDeleteLoading] = useState(false)
+
     const handleStatusChange = async (e) => {
+        if (statusLoading) return;
         const newStatus = e.target.value
         setStatus(newStatus)
+        setStatusLoading(true)
         try {
             await changeStatus(pkg.id, newStatus);
             toast.success("Thay đổi trạng thái thành công")
@@ -20,10 +25,16 @@ export default function ItemsPkg({ pkg }) {
 
         } catch (error) {
             toast.error("Thay đổi trạng thái thất bại")
+        } finally {
+            setStatusLoading(false)
         }
     }
 
     const HandleDelete = async () => {
+        if (deleteLoading) return;
+        if (!confirm("Bạn có chắc muốn xóa gói nạp này?")) return;
+
+        setDeleteLoading(true)
         try {
             const result = await delPkg(pkg.id)
             toast.success(result.message)
@@ -33,9 +44,11 @@ export default function ItemsPkg({ pkg }) {
         } catch (error) {
             console.log(error.message)
             toast.error("Lỗi khi xóa")
+        } finally {
+            setDeleteLoading(false)
         }
-
     }
+
     return (
         <>
             {isEdit ? (
@@ -89,10 +102,11 @@ export default function ItemsPkg({ pkg }) {
                         <select
                             value={status}
                             onChange={handleStatusChange}
-                            className={`px-3 py-2 text-sm font-medium  border transition ${status === "active"
+                            disabled={statusLoading}
+                            className={`px-3 py-2 text-sm font-medium border transition ${status === "active"
                                 ? "bg-green-100 text-green-700 border-green-400"
                                 : "bg-red-100 text-red-700 border-red-400"
-                                }`}
+                                } ${statusLoading ? "opacity-50 cursor-not-allowed" : ""}`}
                         >
                             <option value="active">Đang hoạt động</option>
                             <option value="inactive">Tạm ngưng</option>
@@ -102,13 +116,14 @@ export default function ItemsPkg({ pkg }) {
                         <div className="flex gap-2 justify-between mt-5">
                             <button
                                 onClick={() => { setIsEdit(true) }}
-                                className="px-3 py-1 border text-sm  text-blue-600 border-blue-600 hover:bg-blue-50">
+                                className="px-3 py-1 border text-sm text-blue-600 border-blue-600 hover:bg-blue-50">
                                 Sửa
                             </button>
                             <button
                                 onClick={HandleDelete}
-                                className="px-3 py-1 border textsm text-red-600 border-red-600 hover:bg-red-50">
-                                Xóa
+                                disabled={deleteLoading}
+                                className={`px-3 py-1 border text-sm text-red-600 border-red-600 hover:bg-red-50 ${deleteLoading ? "opacity-50 cursor-not-allowed" : ""}`}>
+                                {deleteLoading ? "Đang xóa..." : "Xóa"}
                             </button>
                         </div>
                     </div>

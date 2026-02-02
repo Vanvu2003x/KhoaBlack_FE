@@ -28,7 +28,9 @@ import api from "@/utils/axios"; // Import api instance
 export default function GameManagerPage() {
     const [games, setGames] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [syncLoading, setSyncLoading] = useState(false); // Valid state
+    const [syncLoading, setSyncLoading] = useState(false);
+    const [submitLoading, setSubmitLoading] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(null); // Track which game is being deleted
     const [searchTerm, setSearchTerm] = useState("");
 
     // Modal State
@@ -138,16 +140,17 @@ export default function GameManagerPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (submitLoading) return;
 
         if (!formData.name || !formData.gamecode) {
             toast.warning("Vui lòng điền đầy đủ tên và mã game");
             return;
         }
 
+        setSubmitLoading(true);
         try {
             const data = new FormData();
 
-            // Construct info object including profit fields
             // Construct info object including profit fields
             const infoObj = {
                 ...formData,
@@ -176,6 +179,7 @@ export default function GameManagerPage() {
                 // Add
                 if (!thumbnailFile) {
                     toast.warning("Vui lòng chọn ảnh thumbnail");
+                    setSubmitLoading(false);
                     return;
                 }
                 await createGame(data);
@@ -187,10 +191,14 @@ export default function GameManagerPage() {
         } catch (error) {
             console.error(error);
             toast.error(error?.response?.data?.message || "Có lỗi xảy ra");
+        } finally {
+            setSubmitLoading(false);
         }
     };
 
     const handleDelete = async (id) => {
+        if (deleteLoading) return;
+
         const result = await Swal.fire({
             title: 'Bạn có chắc chắn?',
             text: "Hành động này không thể hoàn tác!",
@@ -205,12 +213,15 @@ export default function GameManagerPage() {
         });
 
         if (result.isConfirmed) {
+            setDeleteLoading(id);
             try {
                 await deleteGame(id);
                 toast.success("Đã xóa game");
                 fetchGames();
             } catch (error) {
                 toast.error("Lỗi khi xóa game");
+            } finally {
+                setDeleteLoading(null);
             }
         }
     };
@@ -296,10 +307,15 @@ export default function GameManagerPage() {
                                     </button>
                                     <button
                                         onClick={() => handleDelete(game.id)}
-                                        className="p-2 bg-white/10 backdrop-blur-md rounded-lg text-white hover:bg-red-500 hover:text-white transition-colors shadow-lg"
+                                        disabled={deleteLoading === game.id}
+                                        className={`p-2 bg-white/10 backdrop-blur-md rounded-lg text-white hover:bg-red-500 hover:text-white transition-colors shadow-lg ${deleteLoading === game.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         title="Xóa"
                                     >
-                                        <FiTrash2 size={16} />
+                                        {deleteLoading === game.id ? (
+                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                        ) : (
+                                            <FiTrash2 size={16} />
+                                        )}
                                     </button>
                                 </div>
                             </div>
@@ -540,17 +556,23 @@ export default function GameManagerPage() {
                             <button
                                 type="button"
                                 onClick={handleCloseModal}
-                                className="px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors font-medium text-sm"
+                                disabled={submitLoading}
+                                className="px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors font-medium text-sm disabled:opacity-50"
                             >
                                 Hủy
                             </button>
                             <button
                                 type="submit"
-                                onClick={handleSubmit} // Move submit trigger here or keep in form
-                                className="px-4 py-2 rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold shadow-lg shadow-teal-500/20 hover:shadow-teal-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2 text-sm"
+                                onClick={handleSubmit}
+                                disabled={submitLoading}
+                                className={`px-4 py-2 rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold shadow-lg shadow-teal-500/20 hover:shadow-teal-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2 text-sm ${submitLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
-                                <FiSave size={16} />
-                                {currentGame ? "Lưu" : "Thêm"}
+                                {submitLoading ? (
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                ) : (
+                                    <FiSave size={16} />
+                                )}
+                                {submitLoading ? "Đang lưu..." : (currentGame ? "Lưu" : "Thêm")}
                             </button>
                         </div>
                     </div>

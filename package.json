@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "kb:dev": "next dev",
+    "kb:build": "next build",
+    "serve": "next start",
     "lint": "next lint"
   },
   "dependencies": {

@@ -11,6 +11,7 @@ export default function EditGameForm({ game, onCancel }) {
     const [name, setName] = useState(game.name)
     const [publisher, setPublisher] = useState(game.publisher)
     const [sever, setSever] = useState(game.sever)
+    const [loading, setLoading] = useState(false)
 
     const fileRef = useRef(null)
 
@@ -27,6 +28,8 @@ export default function EditGameForm({ game, onCancel }) {
     }
 
     const HandlerSave = async () => {
+        if (loading) return; // Prevent double click
+
         const formData = new FormData();
         const info = {
             name,
@@ -39,6 +42,7 @@ export default function EditGameForm({ game, onCancel }) {
             formData.append("file", img);
         }
 
+        setLoading(true);
         try {
             await updateGame(game.id, formData);
             toast.success("✅ Cập nhật game thành công!");
@@ -46,8 +50,9 @@ export default function EditGameForm({ game, onCancel }) {
             window.location.reload()
         } catch (err) {
             toast.error("❌ Lỗi khi cập nhật game!");
+        } finally {
+            setLoading(false);
         }
-
     };
 
     return (
@@ -142,8 +147,9 @@ export default function EditGameForm({ game, onCancel }) {
             <div className="flex flex-col gap-2 min-w-[100px]">
                 <button
                     onClick={HandlerSave}
-                    className="px-3 py-1 text-sm bg-green-300 border hover:bg-green-400 transition">
-                    Lưu
+                    disabled={loading}
+                    className={`px-3 py-1 text-sm bg-green-300 border hover:bg-green-400 transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                    {loading ? 'Đang lưu...' : 'Lưu'}
                 </button>
                 <button
                     onClick={onCancel}
