@@ -6,21 +6,35 @@ export async function generateMetadata(props) {
     const params = await props.params;
     const gamecode = params.gamecode;
     const apiUrl = process.env.INTERNAL_API_URL || process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://khoablacktopup.vn";
+
     try {
         const game = await getGameByGameCode(gamecode);
         if (game) {
             return {
                 title: `Nạp game ${game.name} - Giá rẻ, Uy tín, Nhanh chóng`,
-                description: `Dịch vụ nạp game ${game.name} siêu tốc, chiết khấu cao, bảo mật 100%. Nạp ngay tại đây!`,
+                description: `Dịch vụ nạp game ${game.name} siêu tốc, chiết khấu cao, bảo mật 100%. Nạp ngay tại KhoaBlackTopup!`,
+                keywords: [`nạp game ${game.name}`, `nạp ${game.name}`, `topup ${game.name}`, "nạp game giá rẻ", "khoablack"],
                 openGraph: {
+                    title: `Nạp game ${game.name} - KhoaBlackTopup`,
+                    description: `Dịch vụ nạp game ${game.name} uy tín nhất. Chiết khấu cao, giao dịch tự động 24/7.`,
+                    images: [game.thumbnail?.startsWith('http') ? game.thumbnail : process.env.NEXT_PUBLIC_API_URL + game.thumbnail],
+                    type: "website",
+                    locale: "vi_VN",
+                },
+                twitter: {
+                    card: "summary_large_image",
                     title: `Nạp game ${game.name}`,
-                    description: `Dịch vụ nạp game ${game.name} uy tín nhất.`,
+                    description: `Dịch vụ nạp game ${game.name} uy tín, giá rẻ.`,
                     images: [game.thumbnail?.startsWith('http') ? game.thumbnail : process.env.NEXT_PUBLIC_API_URL + game.thumbnail],
                 },
                 icons: {
                     icon: game.thumbnail?.startsWith('http') ? game.thumbnail : process.env.NEXT_PUBLIC_API_URL + game.thumbnail,
                     shortcut: game.thumbnail?.startsWith('http') ? game.thumbnail : process.env.NEXT_PUBLIC_API_URL + game.thumbnail,
                     apple: game.thumbnail?.startsWith('http') ? game.thumbnail : process.env.NEXT_PUBLIC_API_URL + game.thumbnail,
+                },
+                alternates: {
+                    canonical: `${baseUrl}/categories/topup/${gamecode}`,
                 },
             };
         }
@@ -48,8 +62,33 @@ export default async function GameTopUpPage(props) {
         game = gameData || null;
     } catch (error) {
         console.error("Error fetching data:", error);
-        // We can handle error/not found state here or pass nulls
     }
 
-    return <TopUpClient game={game} listPkg={listPkg} />;
+    // JSON-LD Structured Data for this game
+    const jsonLd = game ? {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": `Nạp game ${game.name}`,
+        "description": `Dịch vụ nạp game ${game.name} uy tín, giá rẻ, tự động 24/7`,
+        "provider": {
+            "@type": "Organization",
+            "name": "KhoaBlackTopup",
+            "url": process.env.NEXT_PUBLIC_APP_URL || "https://khoablacktopup.vn"
+        },
+        "areaServed": "VN",
+        "image": game.thumbnail?.startsWith('http') ? game.thumbnail : process.env.NEXT_PUBLIC_API_URL + game.thumbnail
+    } : null;
+
+    return (
+        <>
+            {jsonLd && (
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+                />
+            )}
+            <TopUpClient game={game} listPkg={listPkg} />
+        </>
+    );
 }
+
