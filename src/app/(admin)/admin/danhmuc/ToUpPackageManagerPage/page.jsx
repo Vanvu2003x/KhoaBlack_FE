@@ -257,9 +257,9 @@ export default function TopUpPackageManagerPage() {
                 return;
             }
 
-            // SECURITY: Validate file size (5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                toast.error('Dung lượng file tối đa là 5MB');
+            // SECURITY: Validate file size (30MB)
+            if (file.size > 30 * 1024 * 1024) {
+                toast.error('Dung lượng file tối đa là 30MB');
                 e.target.value = '';
                 return;
             }
@@ -760,7 +760,7 @@ export default function TopUpPackageManagerPage() {
                                             className="hidden"
                                         />
                                         <div className="text-sm text-slate-400 space-y-2">
-                                            <p>· Dung lượng tối đa: 5MB</p>
+                                            <p>· Dung lượng tối đa: 30MB</p>
                                             <p>· Định dạng: JPG, PNG, GIF, WEBP</p>
                                             <p>· Tỉ lệ khuyến nghị: 16:9 hoặc hình vuông</p>
                                         </div>

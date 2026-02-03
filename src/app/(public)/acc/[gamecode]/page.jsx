@@ -2,7 +2,7 @@ import AccClient from "./Components/AccClient";
 
 // Dynamic metadata for SEO
 export async function generateMetadata({ params }) {
-    const { gamecode } = params;
+    const { gamecode } = await params;
     // Ưu tiên sử dụng API_URL (internal) nếu có để tránh lỗi loopback trên VPS
     const apiUrl = process.env.INTERNAL_API_URL || process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
 

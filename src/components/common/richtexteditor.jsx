@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useEditor, EditorContent } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import TextStyle, { TextStyleKit } from "@tiptap/extension-text-style"
@@ -12,7 +12,7 @@ export default function RichTextEditor({ value = "", onChange }) {
 
     const editor = useEditor({
         extensions: [StarterKit, TextStyleKit, Color],
-        content,
+        content: value,
         onUpdate: ({ editor }) => {
             const html = editor.getHTML()
             setContent(html)
@@ -20,11 +20,19 @@ export default function RichTextEditor({ value = "", onChange }) {
         },
         editorProps: {
             attributes: {
-                class: 'prose prose-invert max-w-none focus:outline-none min-h-[150px] p-3 text-slate-200'
+                class: 'prose prose-invert max-w-none focus:outline-none min-h-[100px] p-3 text-slate-200 text-sm'
             }
         },
         immediatelyRender: false
     })
+
+    // Sync content when value prop changes (e.g., when switching to edit mode)
+    useEffect(() => {
+        if (editor && value !== content && value !== editor.getHTML()) {
+            editor.commands.setContent(value || '')
+            setContent(value || '')
+        }
+    }, [value, editor])
 
     if (!editor) return null
 
@@ -67,16 +75,6 @@ export default function RichTextEditor({ value = "", onChange }) {
 
             {/* Editor */}
             <EditorContent editor={editor} className="" />
-
-            {/* Preview HTML (Optional - keep but styled) */}
-            <div className="p-3 border-t border-white/10 bg-slate-900/30">
-                <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Preview (HTML):</label>
-                <div
-                    className="p-3 rounded-lg bg-[#020617] border border-white/5 text-slate-400 text-xs font-mono break-all max-h-32 overflow-y-auto custom-scrollbar"
-                >
-                    {content}
-                </div>
-            </div>
         </div>
     )
 }

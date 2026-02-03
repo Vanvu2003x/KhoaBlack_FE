@@ -3,27 +3,42 @@ import { getGames } from "@/services/games.service";
 
 // Metadata SEO
 export const metadata = {
-    title: "KhoaBlack - Shop Acc Game Uy Tín, Giá Rẻ, Tự Động 24/7",
-    description: "KhoaBlack - Hệ thống bán nick game uy tín, nạp game giá rẻ, cày thuê chuyên nghiệp. Giao dịch tự động, bảo mật tuyệt đối, hỗ trợ 24/7.",
-    keywords: ["bán acc game", "shop acc uy tín", "nạp game giá rẻ", "cày thuê game", "khoablack", "shop nick game"],
+    title: "KhoaBlackTopUp - Nạp Game Tốc Độ, Uy Tín, Chất Lượng",
+    description: "KhoaBlackTopUp - Dịch vụ nạp game hàng đầu Việt Nam với tốc độ nhanh chóng, giao dịch tự động 24/7. Mua bán nick game uy tín, bảo mật tuyệt đối, chiết khấu cao nhất thị trường. Shop acc game giá rẻ, cày thuê chuyên nghiệp.",
+    keywords: [
+        "nạp game",
+        "mua nick game",
+        "shop acc game",
+        "khoablack",
+        "topup game",
+        "nạp game uy tín",
+        "khoa black top up",
+        "khoablacktopup",
+        "nạp game tự động",
+        "mua acc game giá rẻ",
+        "cày thuê game",
+        "bán acc game"
+    ],
     authors: [{ name: "KhoaBlack" }],
     creator: "KhoaBlack",
-    publisher: "KhoaBlack",
+    publisher: "KhoaBlackTopUp",
     metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://khoablacktopup.vn"),
     alternates: {
         canonical: "/",
     },
     openGraph: {
-        title: "KhoaBlack - Shop Acc Game Uy Tín Hàng Đầu Việt Nam",
-        description: "KhoaBlack cung cấp tài khoản game giá rẻ, nạp game chiết khấu cao. Hệ thống tự động 24/7, an toàn, tin cậy.",
+        title: "KhoaBlackTopUp - Nạp Game Tốc Độ, Uy Tín, Chất Lượng",
+        description: "Dịch vụ nạp game hàng đầu Việt Nam với tốc độ nhanh chóng, giao dịch tự động 24/7. Mua bán nick game uy tín, bảo mật tuyệt đối, chiết khấu cao nhất thị trường.",
         url: "/",
-        siteName: "KhoaBlack",
+        siteName: "KhoaBlackTopUp",
         images: [
             {
-                url: "/imgs/logo.png",
-                width: 800,
-                height: 600,
-                alt: "KhoaBlack Logo",
+                url: "/imgs/image.png",
+                secureUrl: "https://khoablacktopup.vn/imgs/image.png",
+                width: 1200,
+                height: 630,
+                alt: "KhoaBlackTopUp - Nạp Game Uy Tín",
+                type: "image/png",
             },
         ],
         locale: "vi_VN",
@@ -31,9 +46,9 @@ export const metadata = {
     },
     twitter: {
         card: "summary_large_image",
-        title: "KhoaBlack - Shop Acc Game Uy Tín",
-        description: "Mua bán acc game, nạp game giá rẻ tại KhoaBlack.",
-        images: ["/imgs/logo.png"],
+        title: "KhoaBlackTopUp - Nạp Game Tốc Độ, Uy Tín, Chất Lượng",
+        description: "Dịch vụ nạp game hàng đầu Việt Nam. Giao dịch tự động 24/7, bảo mật tuyệt đối.",
+        images: ["/imgs/image.png"],
     },
     robots: {
         index: true,
@@ -52,13 +67,15 @@ export const metadata = {
 const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "KhoaBlack",
-    "url": process.env.NEXT_PUBLIC_APP_URL || "https://khoablack.com",
+    "name": "KhoaBlackTopUp",
+    "alternateName": ["Khoa Black Top Up", "KhoaBlack", "khoablacktopup"],
+    "url": process.env.NEXT_PUBLIC_APP_URL || "https://khoablacktopup.vn",
+    "description": "Dịch vụ nạp game hàng đầu Việt Nam với tốc độ nhanh chóng, giao dịch tự động 24/7. Mua bán nick game uy tín, bảo mật tuyệt đối.",
     "potentialAction": {
         "@type": "SearchAction",
         "target": {
             "@type": "EntryPoint",
-            "urlTemplate": `${process.env.NEXT_PUBLIC_APP_URL || "https://khoablack.com"}/search?q={search_term_string}`
+            "urlTemplate": `${process.env.NEXT_PUBLIC_APP_URL || "https://khoablacktopup.vn"}/search?q={search_term_string}`
         },
         "query-input": "required name=search_term_string"
     }
@@ -67,9 +84,16 @@ const jsonLd = {
 const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "KhoaBlack",
-    "url": process.env.NEXT_PUBLIC_APP_URL || "https://khoablack.com",
-    "logo": `${process.env.NEXT_PUBLIC_APP_URL || "https://khoablack.com"}/imgs/logo.png`,
+    "name": "KhoaBlackTopUp",
+    "alternateName": ["Khoa Black Top Up", "KhoaBlack"],
+    "url": process.env.NEXT_PUBLIC_APP_URL || "https://khoablacktopup.vn",
+    "logo": {
+        "@type": "ImageObject",
+        "url": `${process.env.NEXT_PUBLIC_APP_URL || "https://khoablacktopup.vn"}/imgs/image.png`,
+        "width": 512,
+        "height": 512
+    },
+    "description": "KhoaBlackTopUp - Nạp Game Tốc Độ, Uy Tín, Chất Lượng",
     "sameAs": []
 };
 

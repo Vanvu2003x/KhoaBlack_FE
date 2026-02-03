@@ -53,9 +53,9 @@ export default function AccForm({ gameList, selectedGame, onSuccess, onClose, ed
                 return
             }
 
-            // SECURITY: Validate file size (5MB)
-            if (selectedFile.size > 5 * 1024 * 1024) {
-                toast.error('Dung lượng file tối đa là 5MB')
+            // SECURITY: Validate file size (30MB)
+            if (selectedFile.size > 30 * 1024 * 1024) {
+                toast.error('Dung lượng file tối đa là 30MB')
                 e.target.value = ''
                 return
             }
@@ -192,13 +192,9 @@ export default function AccForm({ gameList, selectedGame, onSuccess, onClose, ed
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
                 <div className="md:col-span-2">
                     <label className="block font-bold text-slate-300 mb-2">Thông tin tài khoản <span className="text-red-500">*</span></label>
-                    <textarea
-                        className="w-full bg-[#0F172A] border border-white/10 px-3 py-2 rounded-xl text-white focus:border-purple-500/50 outline-none transition-colors resize-none text-sm"
+                    <RichTextEditor
                         value={formData.info}
-                        onChange={e => setFormData(prev => ({ ...prev, info: e.target.value }))}
-                        placeholder="Nhập thông tin chi tiết về tài khoản..."
-                        rows={2}
-                        required
+                        onChange={(html) => setFormData(prev => ({ ...prev, info: html }))}
                     />
                 </div>
 
@@ -274,7 +270,7 @@ export default function AccForm({ gameList, selectedGame, onSuccess, onClose, ed
                             <div className="text-slate-400">
                                 <FiImage className="text-4xl mb-2 mx-auto" />
                                 <span className="text-sm font-medium">Click để tải ảnh lên</span>
-                                <p className="text-xs text-slate-500 mt-1">PNG, JPG, GIF, WEBP - tối đa 5MB</p>
+                                <p className="text-xs text-slate-500 mt-1">PNG, JPG, GIF, WEBP - tối đa 30MB</p>
                             </div>
                         ) : (
                             <div className="relative">

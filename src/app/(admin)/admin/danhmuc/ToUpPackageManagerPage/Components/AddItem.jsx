@@ -43,9 +43,9 @@ export default function AddItemUI({ onCancel, game_id }) {
                 return
             }
 
-            // SECURITY: Validate file size (5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                toast.error('Dung lượng file tối đa là 5MB')
+            // SECURITY: Validate file size (30MB)
+            if (file.size > 30 * 1024 * 1024) {
+                toast.error('Dung lượng file tối đa là 30MB')
                 e.target.value = ''
                 return
             }

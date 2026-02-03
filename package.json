@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "kb:dev": "next dev",
-    "kb:build": "next build",
-    "serve": "next start",
-    "lint": "next lint"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "pm2": "pm2 start npm --name webnap -- start"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

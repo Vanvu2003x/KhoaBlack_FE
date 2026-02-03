@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { FaMailBulk, FaKey } from "react-icons/fa";
+import { FaMailBulk, FaKey, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useToast } from "@/components/ui/Toast";
 import { Login, ForgotPassword, ResetPassword } from "@/services/auth.service";
 import { X } from "lucide-react"; // icon dấu X gọn đẹp
@@ -10,12 +10,15 @@ export default function LoginForm({ onClose, onSwitch }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showForgot, setShowForgot] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const [forgotStep, setForgotStep] = useState(1);
     const [forgotEmail, setForgotEmail] = useState("");
     const [otp, setOtp] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -107,12 +110,19 @@ export default function LoginForm({ onClose, onSwitch }) {
                     <div className="group flex items-center gap-3 border border-slate-700 rounded-xl px-4 py-3 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all bg-slate-800/50 hover:bg-slate-800">
                         <FaKey className="text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                         <input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             placeholder="Mật khẩu"
                             className="flex-1 bg-transparent border-none outline-none text-sm text-white placeholder-slate-500"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="text-slate-400 hover:text-white transition-colors"
+                        >
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                        </button>
                     </div>
 
                     <div className="flex justify-end">
@@ -202,22 +212,36 @@ export default function LoginForm({ onClose, onSwitch }) {
                                 <div className="group flex items-center gap-3 border border-slate-700 rounded-xl px-4 py-3 bg-slate-800/50">
                                     <FaKey className="text-slate-400" />
                                     <input
-                                        type="password"
+                                        type={showNewPassword ? "text" : "password"}
                                         placeholder="Mật khẩu mới"
                                         className="flex-1 bg-transparent border-none outline-none text-sm text-white placeholder-slate-500"
                                         value={newPassword}
                                         onChange={(e) => setNewPassword(e.target.value)}
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowNewPassword(!showNewPassword)}
+                                        className="text-slate-400 hover:text-white transition-colors"
+                                    >
+                                        {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                                    </button>
                                 </div>
                                 <div className="group flex items-center gap-3 border border-slate-700 rounded-xl px-4 py-3 bg-slate-800/50">
                                     <FaKey className="text-slate-400" />
                                     <input
-                                        type="password"
+                                        type={showConfirmPassword ? "text" : "password"}
                                         placeholder="Xác nhận mật khẩu mới"
                                         className="flex-1 bg-transparent border-none outline-none text-sm text-white placeholder-slate-500"
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="text-slate-400 hover:text-white transition-colors"
+                                    >
+                                        {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                                    </button>
                                 </div>
                             </div>
                             <div className="flex flex-col gap-3 mt-6">

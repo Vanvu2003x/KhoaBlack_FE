@@ -4,14 +4,25 @@ import "./globals.css";
 export const metadata = {
     metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://khoablacktopup.vn"),
     title: {
-        default: "KhoaBlackTopup - Nạp Game & Mua Nick Game Uy Tín",
-        template: "%s | KhoaBlackTopup",
+        default: "KhoaBlackTopUp - Nạp Game Tốc Độ, Uy Tín, Chất Lượng",
+        template: "%s | KhoaBlackTopUp",
     },
-    description: "KhoaBlackTopup - Hệ thống nạp game, mua bán nick game uy tín, giá rẻ, tự động 24/7. Chiết khấu cao, bảo mật tuyệt đối.",
-    keywords: ["nạp game", "mua nick game", "shop acc game", "khoablack", "topup game", "nạp game uy tín"],
+    description: "KhoaBlackTopUp - Dịch vụ nạp game hàng đầu Việt Nam với tốc độ nhanh chóng, giao dịch tự động 24/7. Mua bán nick game uy tín, bảo mật tuyệt đối, chiết khấu cao nhất thị trường.",
+    keywords: [
+        "nạp game",
+        "mua nick game",
+        "shop acc game",
+        "khoablack",
+        "topup game",
+        "nạp game uy tín",
+        "khoa black top up",
+        "khoablacktopup",
+        "nạp game tự động",
+        "mua acc game giá rẻ"
+    ],
     authors: [{ name: "KhoaBlack" }],
     creator: "KhoaBlack",
-    publisher: "KhoaBlack",
+    publisher: "KhoaBlackTopUp",
     icons: {
         icon: '/imgs/image.png',
         shortcut: '/imgs/image.png',
@@ -20,14 +31,38 @@ export const metadata = {
     openGraph: {
         type: "website",
         locale: "vi_VN",
-        siteName: "KhoaBlackTopup",
+        url: "https://khoablacktopup.vn",
+        siteName: "KhoaBlackTopUp",
+        title: "KhoaBlackTopUp - Nạp Game Tốc Độ, Uy Tín, Chất Lượng",
+        description: "Dịch vụ nạp game hàng đầu Việt Nam với tốc độ nhanh chóng, giao dịch tự động 24/7. Bảo mật tuyệt đối, chiết khấu cao nhất thị trường.",
+        images: [
+            {
+                url: "/imgs/image.png",
+                width: 1200,
+                height: 630,
+                alt: "KhoaBlackTopUp - Nạp Game Uy Tín",
+            },
+        ],
     },
     twitter: {
         card: "summary_large_image",
+        title: "KhoaBlackTopUp - Nạp Game Tốc Độ, Uy Tín, Chất Lượng",
+        description: "Dịch vụ nạp game hàng đầu Việt Nam. Giao dịch tự động 24/7, bảo mật tuyệt đối.",
+        images: ["/imgs/image.png"],
     },
     robots: {
         index: true,
         follow: true,
+        googleBot: {
+            index: true,
+            follow: true,
+            "max-video-preview": -1,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+        },
+    },
+    alternates: {
+        canonical: "https://khoablacktopup.vn",
     },
     verification: {
         // Add your verification codes here
