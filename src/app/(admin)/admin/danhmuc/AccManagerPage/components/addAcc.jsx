@@ -53,12 +53,7 @@ export default function AccForm({ gameList, selectedGame, onSuccess, onClose, ed
                 return
             }
 
-            // SECURITY: Validate file size (30MB)
-            if (selectedFile.size > 30 * 1024 * 1024) {
-                toast.error('Dung lượng file tối đa là 30MB')
-                e.target.value = ''
-                return
-            }
+
 
             setFile(selectedFile)
             const reader = new FileReader()
@@ -270,7 +265,7 @@ export default function AccForm({ gameList, selectedGame, onSuccess, onClose, ed
                             <div className="text-slate-400">
                                 <FiImage className="text-4xl mb-2 mx-auto" />
                                 <span className="text-sm font-medium">Click để tải ảnh lên</span>
-                                <p className="text-xs text-slate-500 mt-1">PNG, JPG, GIF, WEBP - tối đa 30MB</p>
+                                <p className="text-xs text-slate-500 mt-1">PNG, JPG, GIF, WEBP - Không giới hạn dung lượng</p>
                             </div>
                         ) : (
                             <div className="relative">
