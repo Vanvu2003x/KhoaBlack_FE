@@ -60,7 +60,7 @@ export default function CardGame({ game, type, onClick }) {
                 <div className="flex items-center gap-1 text-gray-400 text-xs mb-3 truncate">
                     <FaGlobe className="text-indigo-400" />
                     <span>
-                        {type === "ACC" ? "Riot Games" : type === "all" ? (game.publisher || "Nhà phát hành") : "Nạp thẻ chính hãng"}
+                        {type === "ACC" ? (game.publisher || "Tài khoản chính chủ") : type === "all" ? (game.publisher || "Nhà phát hành") : "Nạp thẻ chính hãng"}
                     </span>
                 </div>
 

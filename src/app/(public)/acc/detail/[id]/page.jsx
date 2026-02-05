@@ -20,6 +20,7 @@ export default function AccDetailPage() {
     const [showBuyModal, setShowBuyModal] = useState(false)
     const [buying, setBuying] = useState(false)
     const [userLevel, setUserLevel] = useState(1)
+    const [showFullImage, setShowFullImage] = useState(false)
 
     const [contactInfo, setContactInfo] = useState({
         phone: "",
@@ -141,12 +142,15 @@ export default function AccDetailPage() {
                             </div>
 
                             {/* Main Image */}
-                            <div className="relative mb-4 rounded-xl overflow-hidden group">
+                            <div className="relative mb-4 rounded-xl overflow-hidden group cursor-pointer" onClick={() => setShowFullImage(true)}>
                                 <img
                                     src={images[selectedImage]?.startsWith('http') ? images[selectedImage] : `${apiBaseUrl}/uploads/${images[selectedImage]}`}
                                     alt="Account"
-                                    className="w-full h-[400px] object-cover"
+                                    className="w-full h-[400px] object-cover hover:scale-105 transition-transform duration-300"
                                 />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
+                                    <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 px-4 py-2 rounded-lg">Click để xem full ảnh</span>
+                                </div>
                             </div>
 
                             {/* Thumbnails */}
@@ -180,9 +184,13 @@ export default function AccDetailPage() {
                             </h3>
                             <div className="prose prose-invert max-w-none">
                                 <div className="text-slate-300 leading-relaxed">
-                                    <ReactMarkdown>
-                                        {acc.info}
-                                    </ReactMarkdown>
+                                    {acc.info?.includes('<') && acc.info?.includes('>') ? (
+                                        <div dangerouslySetInnerHTML={{ __html: acc.info }} />
+                                    ) : (
+                                        <ReactMarkdown>
+                                            {acc.info}
+                                        </ReactMarkdown>
+                                    )}
                                 </div>
                             </div>
 
@@ -242,7 +250,7 @@ export default function AccDetailPage() {
                         <div className="bg-[#1E293B]/50 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl sticky top-8">
                             <div className="mb-4">
                                 <div className="text-slate-400 text-sm mb-1">MÃ HÀNG TRÚ</div>
-                                <div className="text-white font-bold text-lg">Acc #LOL-{acc.id}</div>
+                                <div className="text-white font-bold text-lg">Acc #{acc.id}</div>
                             </div>
 
                             <div className="border-t border-white/10 pt-4 mb-6">
@@ -260,7 +268,7 @@ export default function AccDetailPage() {
                                         <span className="text-emerald-400 text-xl mb-1">₫</span>
                                     </div>
                                 </div>
-                                <div className="text-slate-500 text-sm mt-1">VÀO TAY GIÁ TOANG</div>
+                                <div className="text-slate-500 text-sm mt-1">Vào tay ngay, giá tốt</div>
                             </div>
 
                             <div className="space-y-3">
@@ -396,6 +404,31 @@ export default function AccDetailPage() {
                             >
                                 {buying ? "Đang xử lý..." : "Xác nhận mua"}
                             </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Full Image Modal */}
+            {showFullImage && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-[fadeIn_0.2s_ease-out] cursor-pointer"
+                    onClick={() => setShowFullImage(false)}
+                >
+                    <div className="relative max-w-[90vw] max-h-[90vh]">
+                        <img
+                            src={images[selectedImage]?.startsWith('http') ? images[selectedImage] : `${apiBaseUrl}/uploads/${images[selectedImage]}`}
+                            alt="Full Image"
+                            className="max-w-full max-h-[90vh] object-contain rounded-lg"
+                        />
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setShowFullImage(false); }}
+                            className="absolute top-4 right-4 text-white bg-black/50 hover:bg-black/70 p-2 rounded-full transition-colors"
+                        >
+                            <FiX size={24} />
+                        </button>
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white bg-black/50 px-4 py-2 rounded-lg text-sm">
+                            Nhấn bất kỳ đâu để đóng
                         </div>
                     </div>
                 </div>
