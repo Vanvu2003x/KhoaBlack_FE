@@ -281,7 +281,7 @@ export default function AccDetailPage() {
                                 </button>
 
                                 <a
-                                    href={`https://zalo.me/0963575203`}
+                                    href={`https://zalo.me/0866996056`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="w-full bg-blue-500/10 text-blue-400 border border-blue-500/20 py-3 rounded-xl font-medium hover:bg-blue-500/20 transition-all flex items-center justify-center gap-2"

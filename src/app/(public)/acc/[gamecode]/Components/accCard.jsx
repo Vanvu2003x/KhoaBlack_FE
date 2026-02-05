@@ -141,7 +141,7 @@ export default function AccCardItem({ acc, userLevel, onBuySuccess }) {
                     {/* Actions Grid */}
                     <div className="grid grid-cols-2 gap-3 mt-auto pt-2">
                         <a
-                            href={`https://zalo.me/${acc.contact?.zalo || "0963575203"}`}
+                            href={`https://zalo.me/${acc.contact?.zalo || "0866996056"}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-all text-xs font-bold border border-white/5 hover:border-white/10"
