@@ -167,101 +167,80 @@ export default function LoginForm({ onClose, onSwitch }) {
                 </div>
             ) : (
                 <div className="space-y-4">
-                    {forgotStep === 1 ? (
-                        <>
-                            <div className="text-center text-slate-400 text-sm mb-4 px-4">
-                                Nhập email của bạn để nhận mã OTP xác thực
-                            </div>
-                            <div className="group flex items-center gap-3 border border-slate-700 rounded-xl px-4 py-3 focus-within:border-blue-500 transition-all bg-slate-800/50">
-                                <FaMailBulk className="text-slate-400" />
-                                <input
-                                    type="email"
-                                    placeholder="Nhập email của bạn"
-                                    className="flex-1 bg-transparent border-none outline-none text-sm text-white placeholder-slate-500"
-                                    value={forgotEmail}
-                                    onChange={(e) => setForgotEmail(e.target.value)}
-                                />
-                            </div>
-                            <div className="flex flex-col gap-3 mt-4">
-                                <button onClick={handleSendEmail} className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 transition-all">
-                                    Gửi mã OTP
-                                </button>
-                                <button
-                                    onClick={() => setShowForgot(false)}
-                                    className="w-full bg-slate-800 text-slate-300 font-bold py-3 rounded-xl hover:bg-slate-700 transition-colors"
-                                >
-                                    Quay lại
-                                </button>
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <div className="text-center text-slate-400 text-sm mb-4">
-                                Mã OTP đã được gửi. Vui lòng kiểm tra email.
-                            </div>
-                            <div className="space-y-4">
-                                <div className="group flex items-center gap-3 border border-slate-700 rounded-xl px-4 py-3 bg-slate-800/50">
-                                    <input
-                                        type="text"
-                                        placeholder="Nhập mã OTP"
-                                        className="flex-1 bg-transparent border-none outline-none text-sm text-center font-bold tracking-widest text-white placeholder-slate-500"
-                                        value={otp}
-                                        onChange={(e) => setOtp(e.target.value)}
-                                    />
-                                </div>
-                                <div className="group flex items-center gap-3 border border-slate-700 rounded-xl px-4 py-3 bg-slate-800/50">
-                                    <FaKey className="text-slate-400" />
-                                    <input
-                                        type={showNewPassword ? "text" : "password"}
-                                        placeholder="Mật khẩu mới"
-                                        className="flex-1 bg-transparent border-none outline-none text-sm text-white placeholder-slate-500"
-                                        value={newPassword}
-                                        onChange={(e) => setNewPassword(e.target.value)}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowNewPassword(!showNewPassword)}
-                                        className="text-slate-400 hover:text-white transition-colors"
-                                    >
-                                        {showNewPassword ? <FaEyeSlash /> : <FaEye />}
-                                    </button>
-                                </div>
-                                <div className="group flex items-center gap-3 border border-slate-700 rounded-xl px-4 py-3 bg-slate-800/50">
-                                    <FaKey className="text-slate-400" />
-                                    <input
-                                        type={showConfirmPassword ? "text" : "password"}
-                                        placeholder="Xác nhận mật khẩu mới"
-                                        className="flex-1 bg-transparent border-none outline-none text-sm text-white placeholder-slate-500"
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                        className="text-slate-400 hover:text-white transition-colors"
-                                    >
-                                        {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="flex flex-col gap-3 mt-6">
-                                <button onClick={handleResetPassword} className="w-full bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 hover:shadow-lg hover:shadow-green-500/30 transition-all">
-                                    Xác nhận đổi mật khẩu
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        setForgotStep(1);
-                                        setOtp("");
-                                        setNewPassword("");
-                                        setConfirmPassword("");
-                                    }}
-                                    className="w-full bg-slate-800 text-slate-300 font-bold py-3 rounded-xl hover:bg-slate-700 transition-colors"
-                                >
-                                    Hủy bỏ
-                                </button>
-                            </div>
-                        </>
-                    )}
+                    <div className="text-center text-slate-400 text-sm mb-4 px-4">
+                        Nhập email và mã OTP để đổi mật khẩu
+                    </div>
+                    <div className="group flex items-center gap-3 border border-slate-700 rounded-xl px-4 py-3 focus-within:border-blue-500 transition-all bg-slate-800/50">
+                        <FaMailBulk className="text-slate-400" />
+                        <input
+                            type="email"
+                            placeholder="Nhập email của bạn"
+                            className="flex-1 bg-transparent border-none outline-none text-sm text-white placeholder-slate-500"
+                            value={forgotEmail}
+                            onChange={(e) => setForgotEmail(e.target.value)}
+                        />
+                        <button
+                            type="button"
+                            onClick={handleSendEmail}
+                            className="text-xs text-blue-400 hover:text-blue-300 font-semibold whitespace-nowrap"
+                        >
+                            Gửi OTP
+                        </button>
+                    </div>
+                    <div className="group flex items-center gap-3 border border-slate-700 rounded-xl px-4 py-3 bg-slate-800/50">
+                        <input
+                            type="text"
+                            placeholder="Nhập mã OTP"
+                            className="flex-1 bg-transparent border-none outline-none text-sm text-center font-bold tracking-widest text-white placeholder-slate-500"
+                            value={otp}
+                            onChange={(e) => setOtp(e.target.value)}
+                        />
+                    </div>
+                    <div className="group flex items-center gap-3 border border-slate-700 rounded-xl px-4 py-3 bg-slate-800/50">
+                        <FaKey className="text-slate-400" />
+                        <input
+                            type={showNewPassword ? "text" : "password"}
+                            placeholder="Mật khẩu mới"
+                            className="flex-1 bg-transparent border-none outline-none text-sm text-white placeholder-slate-500"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                            className="text-slate-400 hover:text-white transition-colors"
+                        >
+                            {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                        </button>
+                    </div>
+                    <div className="group flex items-center gap-3 border border-slate-700 rounded-xl px-4 py-3 bg-slate-800/50">
+                        <FaKey className="text-slate-400" />
+                        <input
+                            type={showConfirmPassword ? "text" : "password"}
+                            placeholder="Xác nhận mật khẩu mới"
+                            className="flex-1 bg-transparent border-none outline-none text-sm text-white placeholder-slate-500"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="text-slate-400 hover:text-white transition-colors"
+                        >
+                            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                        </button>
+                    </div>
+                    <div className="flex flex-col gap-3 mt-6">
+                        <button onClick={handleResetPassword} className="w-full bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 hover:shadow-lg hover:shadow-green-500/30 transition-all">
+                            Xác nhận đổi mật khẩu
+                        </button>
+                        <button
+                            onClick={() => setShowForgot(false)}
+                            className="w-full bg-slate-800 text-slate-300 font-bold py-3 rounded-xl hover:bg-slate-700 transition-colors"
+                        >
+                            Quay lại
+                        </button>
+                    </div>
                 </div>
             )}
         </div>

@@ -109,7 +109,7 @@ const MorishopTestPage = () => {
         <div className="p-6 max-w-6xl mx-auto bg-slate-900 min-h-screen text-slate-100 font-sans">
             <div className="mb-8 pb-4 border-b border-slate-700 text-center">
                 <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-indigo-400">
-                    Morishop API Integration
+                    Web Tàu API Integration
                 </h1>
                 <p className="text-slate-400 mt-2">Internal Test Environment</p>
             </div>
@@ -124,8 +124,8 @@ const MorishopTestPage = () => {
                             setLoading(false);
                         }}
                         className={`px-6 py-3 rounded-lg font-semibold transition-all ${activeTab === tab.id
-                                ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/30'
-                                : 'bg-slate-800 text-slate-400 hover:text-sky-400 hover:bg-slate-750 border border-slate-700'
+                            ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/30'
+                            : 'bg-slate-800 text-slate-400 hover:text-sky-400 hover:bg-slate-750 border border-slate-700'
                             }`}
                     >
                         {tab.label}

@@ -70,7 +70,7 @@ export default function GameManagerPage() {
         try {
             setSyncLoading(true);
             await api.post('/api/tools/sync-napgame');
-            toast.success("Đã đồng bộ dữ liệu từ NapGame247");
+            toast.success("Đã đồng bộ dữ liệu từ Việt");
             fetchGames(); // Refresh list to see new items
         } catch (error) {
             console.error(error);

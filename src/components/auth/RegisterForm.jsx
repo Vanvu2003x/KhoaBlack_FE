@@ -158,18 +158,16 @@ export default function RegisterForm({ onClose, onSwitch }) {
                 </div>
 
                 {/* Nhập OTP */}
-                {showOTP && (
-                    <div className="group flex items-center gap-3 border rounded-xl px-4 py-3 bg-blue-900/20 border-blue-500/50 focus-within:border-blue-400 animate-[slideDown_0.2s_ease-out]">
-                        <FaCheckCircle className="text-green-400" />
-                        <input
-                            type="text"
-                            placeholder="Nhập mã OTP vừa nhận"
-                            className="flex-1 bg-transparent border-none outline-none text-sm font-semibold text-blue-200 placeholder-blue-400/50"
-                            value={OTP}
-                            onChange={(e) => setOTP(e.target.value)}
-                        />
-                    </div>
-                )}
+                <div className="group flex items-center gap-3 border rounded-xl px-4 py-3 bg-blue-900/20 border-blue-500/50 focus-within:border-blue-400">
+                    <FaCheckCircle className="text-green-400" />
+                    <input
+                        type="text"
+                        placeholder="Nhập mã OTP vừa nhận"
+                        className="flex-1 bg-transparent border-none outline-none text-sm font-semibold text-blue-200 placeholder-blue-400/50"
+                        value={OTP}
+                        onChange={(e) => setOTP(e.target.value)}
+                    />
+                </div>
 
                 {/* Mật khẩu */}
                 <div className="group flex items-center gap-3 border border-slate-700 rounded-xl px-4 py-3 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all bg-slate-800/50 hover:bg-slate-800">
