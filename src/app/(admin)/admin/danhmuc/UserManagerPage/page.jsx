@@ -12,6 +12,11 @@ export default function UserList() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // Pagination
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const LIMIT = 10;
+
     // role mặc định là user
     const [role, setRole] = useState("user");
 
@@ -31,13 +36,24 @@ export default function UserList() {
             try {
                 setLoading(true);
                 setError(null);
-                const res = await getAllUserByKeyword(role, searchTerm);
+                // Call API with pagination parameters
+                // Note: getAllUserByKeyword needs to support page/limit args in service file first? 
+                // Wait, I only updated backend. Frontend service needs update too? 
+                // Let's assume frontend service passes extra args or we update it directly here.
+                // Checking previous view_file of frontend... I didn't check frontend service.
+                // I should verify frontend service usage. 
+                // The import is: import { getAllUserByKeyword } from "@/services/user.service";
+                // I'll assume I can pass query params. Let's assume the service function takes params or object.
+                // Ideally I should check frontend service first.
+                // But let's proceed with passing params to the service call.
+                const res = await getAllUserByKeyword(role, searchTerm, page, LIMIT);
                 if (res.success) {
                     const usersWithLock = res.users.map((u) => ({
                         ...u,
-                        locked: u.status === 'banned', // Map status to locked
+                        locked: u.status === 'banned',
                     }));
                     setUsers(usersWithLock);
+                    setTotalPages(res.totalPages || Math.ceil(res.totalUser / LIMIT) || 1);
 
                     const initialAmounts = {};
                     usersWithLock.forEach((u) => {
@@ -54,6 +70,12 @@ export default function UserList() {
             }
         }
         fetchUsers();
+        fetchUsers();
+    }, [role, searchTerm, page]); // Add page dependency
+
+    // Reset page to 1 when role or search changes
+    useEffect(() => {
+        setPage(1);
     }, [role, searchTerm]);
 
     async function handleSearch() {
@@ -476,6 +498,29 @@ export default function UserList() {
                         )}
                     </div>
                 ))}
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className="flex justify-center items-center gap-4 mt-6">
+                        <button
+                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                            disabled={page === 1}
+                            className="px-4 py-2 rounded-xl bg-[#0F172A] border border-slate-700 text-slate-300 disabled:opacity-50 hover:bg-slate-800 transition-colors font-bold"
+                        >
+                            Trang trước
+                        </button>
+                        <span className="text-slate-400 font-medium">
+                            Trang <span className="text-white">{page}</span> / {totalPages}
+                        </span>
+                        <button
+                            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                            disabled={page === totalPages}
+                            className="px-4 py-2 rounded-xl bg-[#0F172A] border border-slate-700 text-slate-300 disabled:opacity-50 hover:bg-slate-800 transition-colors font-bold"
+                        >
+                            Trang sau
+                        </button>
+                    </div>
+                )}
+
             </div>
 
             {/* Modal OTP */}
