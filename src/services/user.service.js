@@ -26,8 +26,8 @@ export async function changeBalance(id, amount, type) {
   return response.data;
 }
 
-export async function getAllUserByKeyword(role, keyword, page = 1, limit = 10) {
-  const response = await api.get(`/api/user/search?role=${role}&keyword=${keyword}&page=${page}&limit=${limit}`);
+export async function getAllUserByKeyword(role, keyword) {
+  const response = await api.get(`/api/user/search?role=${role}&keyword=${keyword}`);
 
   return response.data;
 }
