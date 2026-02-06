@@ -15,6 +15,7 @@ export default function UserList() {
     // Pagination
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [totalRecords, setTotalRecords] = useState(0);
     const LIMIT = 10;
 
     // role mặc định là user
@@ -53,7 +54,8 @@ export default function UserList() {
                         locked: u.status === 'banned',
                     }));
                     setUsers(usersWithLock);
-                    setTotalPages(res.totalPages || Math.ceil(res.totalUser / LIMIT) || 1);
+                    setTotalPages(res.totalPages || 1);
+                    setTotalRecords(res.totalUser || 0);
 
                     const initialAmounts = {};
                     usersWithLock.forEach((u) => {
@@ -284,7 +286,7 @@ export default function UserList() {
                         <FiUsers className="text-cyan-400" /> Quản lý Khách hàng
                     </h1>
                     <p className="text-slate-400 text-sm mt-1">
-                        Danh sách ({users.length}) tài khoản trên hệ thống
+                        Danh sách ({totalRecords}) tài khoản trên hệ thống
                     </p>
                 </div>
 
@@ -499,27 +501,51 @@ export default function UserList() {
                     </div>
                 ))}
                 {/* Pagination Controls */}
-                {totalPages > 1 && (
-                    <div className="flex justify-center items-center gap-4 mt-6">
-                        <button
-                            onClick={() => setPage(p => Math.max(1, p - 1))}
-                            disabled={page === 1}
-                            className="px-4 py-2 rounded-xl bg-[#0F172A] border border-slate-700 text-slate-300 disabled:opacity-50 hover:bg-slate-800 transition-colors font-bold"
-                        >
-                            Trang trước
-                        </button>
-                        <span className="text-slate-400 font-medium">
-                            Trang <span className="text-white">{page}</span> / {totalPages}
-                        </span>
-                        <button
-                            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                            disabled={page === totalPages}
-                            className="px-4 py-2 rounded-xl bg-[#0F172A] border border-slate-700 text-slate-300 disabled:opacity-50 hover:bg-slate-800 transition-colors font-bold"
-                        >
-                            Trang sau
-                        </button>
-                    </div>
-                )}
+                {/* Pagination Controls */}
+                <div className="flex justify-center items-center gap-2 mt-6 flex-wrap">
+                    <button
+                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                        disabled={page === 1}
+                        className="p-2 rounded-lg bg-[#0F172A] border border-slate-700 text-slate-300 disabled:opacity-50 hover:bg-slate-800 transition-colors"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+                    </button>
+
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                        // Logic to show safe range of pages around current page
+                        let pNum = page;
+                        if (totalPages <= 5) {
+                            pNum = i + 1;
+                        } else if (page <= 3) {
+                            pNum = i + 1;
+                        } else if (page >= totalPages - 2) {
+                            pNum = totalPages - 4 + i;
+                        } else {
+                            pNum = page - 2 + i;
+                        }
+
+                        return (
+                            <button
+                                key={pNum}
+                                onClick={() => setPage(pNum)}
+                                className={`w-9 h-9 rounded-lg font-bold text-sm transition-all border ${page === pNum
+                                        ? "bg-cyan-600 text-white border-cyan-500 shadow-lg shadow-cyan-500/20"
+                                        : "bg-[#0F172A] text-slate-400 border-slate-700 hover:text-white hover:border-slate-500"
+                                    }`}
+                            >
+                                {pNum}
+                            </button>
+                        );
+                    })}
+
+                    <button
+                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                        disabled={page === totalPages}
+                        className="p-2 rounded-lg bg-[#0F172A] border border-slate-700 text-slate-300 disabled:opacity-50 hover:bg-slate-800 transition-colors"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                    </button>
+                </div>
 
             </div>
 
